@@ -1,17 +1,8 @@
-# Collect all C source files from kernel and drivers
-CFILES = $(wildcard ./kernel/*.c) $(wildcard ./drivers/*.c)
+CFILES := $(wildcard */*.c)
+OFILES := $(addprefix build/, $(notdir $(CFILES:.c=.o)))
 
-# Convert source paths to object paths (flat in ./build/)
-
-# Step 1: Strip directory path (e.g., ./kernel/foo.c → foo.c)
-OFILES = $(notdir $(CFILES))
-
-# Step 2: Replace .c extension with .o (e.g., foo.c → foo.o)
-OFILES := $(OFILES:.c=.o)
-
-# Step 3: Add build/ prefix to object files (e.g., foo.o → ./build/foo.o)
-OFILES := $(addprefix ./build/, $(OFILES))
-
+$(info CFILES: $(CFILES))
+$(info OFILES: $(OFILES))
 
 # Compiler flags
 GCCFLAGS = -Wall -O2 -ffreestanding -nostdinc -nostdlib 
@@ -23,10 +14,7 @@ all: clean kernel8.img run
 ./build/boot.o: ./kernel/boot.S
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
-./build/%.o: ./kernel/%.c
-	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
-
-./build/%.o: ./drivers/%.c
+./build/%.o: ./*/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
 # Link all object files into kernel8.img
