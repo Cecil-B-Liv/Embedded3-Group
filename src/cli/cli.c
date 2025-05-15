@@ -1,11 +1,13 @@
 #include "../drivers/uart1.h"
+#include "cli.h"
+#include "commands.h"
 
 #define MAX_COMMAND_SIZE 100
 #define myOs "FixingGoodOS>"
 
 // Static varriable to keep track of the command buffer
 static char commandBuffer[MAX_COMMAND_SIZE];
-static int cbPointer = 0; // pointer of command buffer
+static int cbIndex = 0; // pointer of command buffer
 
 void cli_welcome(){
     uart_puts("==============================================================================================================\n\n");
@@ -40,25 +42,27 @@ void cli_process(){
 
         // User press ENTER
         case '\n':
-            uart_sendc('\n');
-            uart_puts("Command Entered: ");
-            for (int i = 0; commandBuffer[i] != '\0'; i++) {  
-                uart_sendc(commandBuffer[i]);
-            }
-            uart_sendc('\n');
-            uart_puts(myOs);
-            
+                // Call the commands processer function
+                cmdProcess(commandBuffer);
+
+                // Clear the command buffer and reset the index
+                for (char *p = commandBuffer; *p != '\0'; p++) {  
+                    *p = '\0';
+                }
+                cbIndex = 0;
+
+                uart_puts(myOs);
             break;
+        
         // Normal input
         default:
-
             // Maximum command size reached
-            if (cbPointer > MAX_COMMAND_SIZE - 1){
+            if (cbIndex > MAX_COMMAND_SIZE - 1){
                 break; // do nothing
             }
             // Add the new character to the buffer
-            commandBuffer[cbPointer] = c;
-            cbPointer++;
+            commandBuffer[cbIndex] = c;
+            cbIndex++;
             // Print the user input to the terminal
             uart_sendc(c);
             // ==== DEBUG ==== //
@@ -71,7 +75,7 @@ void cli_process(){
             //     uart_sendc(commandBuffer[i]);
             // }  
             //  uart_puts("\nPointer\n");  
-            // uart_sendc((char)cbPointer);
+            // uart_sendc((char)cbIndex);
             // ==== DEBUG ==== //
     }
 }
