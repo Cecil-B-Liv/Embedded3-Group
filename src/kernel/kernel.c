@@ -3,20 +3,15 @@
 #include "../drivers/framebf.h"
 #include "../cli/cli.h"
 
-void main()
-{
+void main(){
     // set up serial console
 	uart_init();
 
 	// cli print message
 	cli_welcome();
 
-	// echo everything back
-	// while(1) {
-	// 	//read each char
-	// 	char c = uart_getc();
-
-	// 	//send back 
-	// 	uart_sendc(c);
-	// }
+	// CLI processing
+	while (1){
+		cli_process();
+	}
 }

@@ -1,38 +1,77 @@
 #include "../drivers/uart1.h"
 
-// 8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  
-// 888          888    Y88b d88P    888   8888b   888 d88P  Y88b    d88P  Y88b d88P" "Y88b d88P" "Y88b 888  "Y88b 
-// 888          888     Y88o88P     888   88888b  888 888    888    888    888 888     888 888     888 888    888 
-// 8888888      888      Y888P      888   888Y88b 888 888           888        888     888 888     888 888    888 
-// 888          888      d888b      888   888 Y88b888 888  88888    888  88888 888     888 888     888 888    888 
-// 888          888     d88888b     888   888  Y88888 888    888    888    888 888     888 888     888 888    888 
-// 888          888    d88P Y88b    888   888   Y8888 Y88b  d88P    Y88b  d88P Y88b. .d88P Y88b. .d88P 888  .d88P 
-// 888        8888888 d88P   Y88b 8888888 888    Y888  "Y8888P88     "Y8888P88  "Y88888P"   "Y88888P"  8888888P"  
-                                                                                                            
+#define MAX_COMMAND_SIZE 100
+#define myOs "FixingGoodOS>"
+
+// Static varriable to keep track of the command buffer
+static char commandBuffer[MAX_COMMAND_SIZE];
+static int cbPointer = 0; // pointer of command buffer
 
 void cli_welcome(){
-    uart_puts("==============================================================================================================\r\n\n");
-    uart_puts("8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  \r\n");
-    uart_puts("888          888    Y88b d88P    888   8888b   888 d88P  Y88b    d88P  Y88b d88P   Y88b d88P   Y88b 888   Y88b \r\n");
-    uart_puts("888          888     Y88o88P     888   88888b  888 888    888    888    888 888     888 888     888 888    888 \r\n");
-    uart_puts("8888888      888      Y888P      888   888Y88b 888 888           888        888     888 888     888 888    888 \r\n");
-    uart_puts("888          888      d888b      888   888 Y88b888 888  88888    888  88888 888     888 888     888 888    888 \r\n");
-    uart_puts("888          888     d88888b     888   888  Y88888 888    888    888    888 888     888 888     888 888    888 \r\n");
-    uart_puts("888          888    d88P Y88b    888   888   Y8888 Y88b  d88P    Y88b  d88P Y88b. .d88P Y88b. .d88P 888  .d88P \r\n");
-    uart_puts("888        8888888 d88P   Y88b 8888888 888    Y888  Y8888P88      Y8888P88   Y88888P      Y88888P   8888888P   \r\n");
+    uart_puts("==============================================================================================================\n\n");
+    uart_puts("8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  \n");
+    uart_puts("888          888    Y88b d88P    888   8888b   888 d88P  Y88b    d88P  Y88b d88P   Y88b d88P   Y88b 888   Y88b \n");
+    uart_puts("888          888     Y88o88P     888   88888b  888 888    888    888    888 888     888 888     888 888    888 \n");
+    uart_puts("8888888      888      Y888P      888   888Y88b 888 888           888        888     888 888     888 888    888 \n");
+    uart_puts("888          888      d888b      888   888 Y88b888 888  88888    888  88888 888     888 888     888 888    888 \n");
+    uart_puts("888          888     d88888b     888   888  Y88888 888    888    888    888 888     888 888     888 888    888 \n");
+    uart_puts("888          888    d88P Y88b    888   888   Y8888 Y88b  d88P    Y88b  d88P Y88b. .d88P Y88b. .d88P 888  .d88P \n");
+    uart_puts("888        8888888 d88P   Y88b 8888888 888    Y888  Y8888P88      Y8888P88   Y88888P      Y88888P   8888888P   \n");
     uart_puts("\r\n");
 
-    uart_puts("==============================================================================================================\r\n");
+    uart_puts("==============================================================================================================\n");
     uart_puts("                                          Developer Team\r\n");
-    uart_puts("--------------------------------------------------------------------------------------------------------------\r\n");
+    uart_puts("--------------------------------------------------------------------------------------------------------------\n");
     uart_puts("  - Kim Nhat Anh       | ID: s3978831\r\n");
     uart_puts("  - Huynh Ngoc Tai     | ID: s3978680\r\n");
-    uart_puts("  - Tran Quang Minh    | ID: s\r\n");
+    uart_puts("  - Tran Quang Minh    | ID: s3988776\r\n");
     uart_puts("  - asdfadfasdf        | ID: 111111111\r\n");
-    uart_puts("==============================================================================================================\r\n");
-    uart_puts("\r\n");
+    uart_puts("==============================================================================================================\n");
+    uart_puts("\n");
+    uart_puts(myOs);
 }
 
 void cli_process(){
-    
+    // Get the user input
+    char c = uart_getc();
+
+    //Process the user input base on different case
+    switch (c){
+
+        // User press ENTER
+        case '\n':
+            uart_sendc('\n');
+            uart_puts("Command Entered: ");
+            for (int i = 0; commandBuffer[i] != '\0'; i++) {  
+                uart_sendc(commandBuffer[i]);
+            }
+            uart_sendc('\n');
+            uart_puts(myOs);
+            
+            break;
+        // Normal input
+        default:
+
+            // Maximum command size reached
+            if (cbPointer > MAX_COMMAND_SIZE - 1){
+                break; // do nothing
+            }
+            // Add the new character to the buffer
+            commandBuffer[cbPointer] = c;
+            cbPointer++;
+            // Print the user input to the terminal
+            uart_sendc(c);
+            // ==== DEBUG ==== //
+            // uart_puts("\nChecking\n");
+            // uart_puts("Buffer\n");
+            // for (int i = 0; commandBuffer[i] != '\0'; i++) {
+              
+               
+                
+            //     uart_sendc(commandBuffer[i]);
+            // }  
+            //  uart_puts("\nPointer\n");  
+            // uart_sendc((char)cbPointer);
+            // ==== DEBUG ==== //
+    }
 }
