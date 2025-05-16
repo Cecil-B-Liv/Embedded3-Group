@@ -66,13 +66,16 @@ void help(char *arg){
 }
 
 void clear(char* arg){
-    // if (arg != '\0'){
+    // This command accept no argument
+    if(arg != 0){
+        error(arg);
+        return;
+    }
 
-    // }
-    // // Move the cursoer to somewhere user will not see
-    // for (int i = 0; i < 50; i++){
-    //     uart_sendc('\n');
-    // }
+    // move the cursor to the location where user cannot see
+    for(int i = 0; i < 50; i++){
+        uart_sendc('\n');
+    }
 }
 void braudRate(char* arg){
 
