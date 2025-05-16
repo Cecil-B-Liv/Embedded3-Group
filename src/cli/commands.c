@@ -15,13 +15,12 @@ const commandArr commands[COMMAND_NUMBER] = {
 void cmdProcess(char* cmdBuff){
     for (int i = 0; i < COMMAND_NUMBER; i++){
         if (strComp(cmdBuff, commands[i].name)){
-            uart_sendc('\n');
-            uart_puts(commands[i].name);
-            uart_sendc('\n');
+            commands[i].cmdFunc();
             return;
         }
     }
 
+    // If the command is not recognized
     uart_puts("\n[ERROR] ");
     uart_sendc('"');
     uart_puts(cmdBuff);
@@ -36,7 +35,10 @@ void helpC(){
 
 }
 void clear(){
-
+    // Move the cursoer to somewhere user will not see
+    for (int i = 0; i < 50; i++){
+        uart_sendc('\n');
+    }
 }
 void braudRate(){
 

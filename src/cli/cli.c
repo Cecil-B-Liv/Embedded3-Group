@@ -42,16 +42,11 @@ void cli_process(){
 
         // User press ENTER
         case '\n':
-                // Call the commands processer function
-                cmdProcess(commandBuffer);
+            // Call the commands processer function
+            cmdProcess(commandBuffer);
 
-                // Clear the command buffer and reset the index
-                for (int i = 0; i < cbIndex; i++) {  
-                    commandBuffer[i] = '\0';
-                }
-                cbIndex = 0;
-
-                uart_puts(myOs);
+            // Clear buffer after process the command 
+            clearBuff();
             break;
         
         // User delete character
@@ -82,4 +77,14 @@ void cli_process(){
             // Print the user input to the terminal
             uart_sendc(c);
     }
+}
+
+// Clear buffer and create now input line
+void clearBuff(){
+  // Clear the command buffer and reset the index
+    for (int i = 0; i < cbIndex; i++) {  
+        commandBuffer[i] = '\0';
+    }
+    cbIndex = 0;
+    uart_puts(myOs);
 }
