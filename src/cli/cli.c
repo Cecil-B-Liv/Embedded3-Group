@@ -86,5 +86,6 @@ void clearBuff(){
         commandBuffer[i] = '\0';
     }
     cbIndex = 0;
+    uart_sendc('\n');
     uart_puts(myOs);
 }
