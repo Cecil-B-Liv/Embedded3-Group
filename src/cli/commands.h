@@ -2,7 +2,7 @@
 typedef struct {
     char* name;           // Name of the command
     char* des;            // Command description
-    void(*cmdFunc)(void); // pointer to the actual function of the commands
+    void(*cmdFunc)(char *args); // pointer to the actual function of the commands, take the argument of each function
 } commandArr;
 
 
@@ -12,3 +12,5 @@ void helpC();
 void clear();
 void braudRate();
 void handShake();
+
+int getArgIndex(char* commandBuff);

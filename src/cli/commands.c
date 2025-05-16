@@ -3,7 +3,6 @@
 #include "../drivers/uart1.h"
 #define MAX_COMMAND_NUMBER 4
 
-
 const commandArr commands[MAX_COMMAND_NUMBER] = {
     { "help", "                  Show brief information of all commands", help},
     { "clear", "                 Clear screen", clear},
@@ -13,14 +12,25 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
 
 
 void cmdProcess(char* cmdBuff){
+    // Split the original buffer too two, cmd and argument
+    char* cmd = cmdBuff;
+    char* arg;
+    int spaceIndex = 0;
+    for (spaceIndex; cmd[spaceIndex] != '\0'; spaceIndex++){
+        if (cmd[spaceIndex] == ' '){
+            cmd[spaceIndex] = '\0';
+            arg = cmdBuff + spaceIndex + 1; // start of the argument
+        }
+    }
+
+    // Command checking
     for (int i = 0; i < MAX_COMMAND_NUMBER; i++){
         if (strComp(cmdBuff, commands[i].name)){
-            commands[i].cmdFunc();
+            commands[i].cmdFunc(arg);
             return;
         }
     }
 
-    // If the command is not recognized
     uart_puts("\n[ERROR] ");
     uart_sendc('"');
     uart_puts(cmdBuff);
@@ -39,7 +49,7 @@ void help(){
     uart_puts("\nFor more information on a specific command, type help <command-name>\n");
 }
 void helpC(){
-
+    
 }
 void clear(){
     // Move the cursoer to somewhere user will not see
@@ -53,3 +63,4 @@ void braudRate(){
 void handShake(){
 
 }
+
