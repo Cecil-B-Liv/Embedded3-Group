@@ -7,10 +7,9 @@ typedef struct {
 
 
 void cmdProcess(char* cmdBuff);
-void help();
-void helpC();
-void clear();
-void braudRate();
-void handShake();
+void help(char* arg);
+void clear(char* arg);
+void braudRate(char* arg);
+void handShake(char* arg);
 
-int getArgIndex(char* commandBuff);
+void error(char *error);
