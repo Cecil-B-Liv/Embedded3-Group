@@ -14,15 +14,19 @@ const commandArr commands[COMMAND_NUMBER] = {
 
 void cmdProcess(char* cmdBuff){
     for (int i = 0; i < COMMAND_NUMBER; i++){
-        if (strComp(cmdBuff, (commands + i)->name)){
+        if (strComp(cmdBuff, commands[i].name)){
             uart_sendc('\n');
-            uart_puts((commands + i)->name);
+            uart_puts(commands[i].name);
             uart_sendc('\n');
             return;
         }
     }
 
-    uart_puts("\n[ERROR] Command Not Exist\n");
+    uart_puts("\n[ERROR] ");
+    uart_sendc('"');
+    uart_puts(cmdBuff);
+    uart_sendc('"');
+    uart_puts(" is not recognized\n");
 }
 
 void help(){

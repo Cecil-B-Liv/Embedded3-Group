@@ -46,14 +46,30 @@ void cli_process(){
                 cmdProcess(commandBuffer);
 
                 // Clear the command buffer and reset the index
-                for (char *p = commandBuffer; *p != '\0'; p++) {  
-                    *p = '\0';
+                for (int i = 0; i < cbIndex; i++) {  
+                    commandBuffer[i] = '\0';
                 }
                 cbIndex = 0;
 
                 uart_puts(myOs);
             break;
         
+        // User delete character
+        case '\b':
+            // Nothing to delete
+            if (cbIndex == 0){ 
+                break;
+            }
+
+            // Visual display delete for user
+            uart_sendc('\b');
+            uart_sendc(' ');
+            uart_sendc('\b');
+
+            // Modify the buffer
+            cbIndex--;
+            commandBuffer[cbIndex] = '\0';
+            break;
         // Normal input
         default:
             // Maximum command size reached
@@ -65,17 +81,5 @@ void cli_process(){
             cbIndex++;
             // Print the user input to the terminal
             uart_sendc(c);
-            // ==== DEBUG ==== //
-            // uart_puts("\nChecking\n");
-            // uart_puts("Buffer\n");
-            // for (int i = 0; commandBuffer[i] != '\0'; i++) {
-              
-               
-                
-            //     uart_sendc(commandBuffer[i]);
-            // }  
-            //  uart_puts("\nPointer\n");  
-            // uart_sendc((char)cbIndex);
-            // ==== DEBUG ==== //
     }
 }
