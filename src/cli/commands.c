@@ -1,12 +1,14 @@
 #include "commands.h"
 #include "../ultil/stringUltil.h"
 #include "../drivers/uart1.h"
+#include "../drivers/mbox.h"
 
-#define MAX_COMMAND_NUMBER 4
+#define MAX_COMMAND_NUMBER 5
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
     { "help", "                       Show brief information of all commands", help},
     { "clear", "                      Clear screen", clear},
+    { "showinfo", "                   Show board revision and board MAC address", showInfo},
     { "braudRate", "                  Allow the user to change the baudrate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", braudRate},
     { "handShake", "                  Allow the user to turn on/off CTS/RTS handsharking", handShake}
 };
@@ -16,11 +18,10 @@ void cmdProcess(char* cmdBuff){
     // Split the original buffer too two, cmd and argument
     char* cmd = cmdBuff;
     char* arg = 0; // NULL pointer
-    int spaceIndex = 0; // Find and store the first space index
-    for (; cmd[spaceIndex] != '\0'; spaceIndex++){
-        if (cmd[spaceIndex] == ' '){
-            cmd[spaceIndex] = '\0';
-            arg = cmdBuff + spaceIndex + 1; // start of the argument
+    for (int i = 0; cmd[i] != '\0'; i++){
+        if (cmd[i] == ' '){
+            cmd[i] = '\0';
+            arg = cmdBuff + i + 1; // start of the argument
             break;
         }
     }
@@ -77,11 +78,65 @@ void clear(char* arg){
         uart_sendc('\n');
     }
 }
-void braudRate(char* arg){
 
+void showInfo(char* arg){
+    // This command accept no argument
+    if(arg != 0){
+        error(arg);
+        return;
+    }
+
+    // Mail Box Request
+    // mailbox data buffer
+    mBuf[0] = 11*4; // Message Buffer Size in bytes 
+    mBuf[1] = MBOX_REQUEST; // Message Request Code (this is a request message)
+    
+    mBuf[2] = 0x00010002; // Board Revision
+    mBuf[3] = 4; // Value buffer size in bytes (max of request and response lengths)
+    mBuf[4] = 0; // REQUEST CODE = 0
+    mBuf[5] = 0; // Board Revision Value 
+
+    mBuf[6] = 0x00010003; // Board MAC Adress 
+    mBuf[7] = 6; // Value buffer size in bytes (max of request and response lengths)
+    mBuf[8] = 0; // REQUEST CODE = 0
+    mBuf[9] = 0; // Board MAC address Value 
+
+    mBuf[10] = MBOX_TAG_LAST;
+
+    // Call the Mail Box and get responses
+    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
+
+        // Varriable to hold the value of board revision and MAC Adress
+        int boardRev = mBuf[5];
+        char* mac = (char*)&mBuf[9];
+
+        // Board Revision Information
+        uart_puts("\nBoard Revision: ");
+        uart_hex(boardRev);
+        uart_puts("\n");
+        uart_puts(getBoardModel(boardRev));
+
+        // MAC Adress (6 values format)
+        uart_puts("\nMAC Address: ");
+        for (int i = 0; i < 6; i++) {
+            uart_hex(mac[i]);
+            if (i < 5) uart_puts(":");
+        }
+    }
+}
+void braudRate(char* arg){
+    // This command accept no argument
+    if(arg != 0){
+        error(arg);
+        return;
+    }
 }
 void handShake(char* arg){
-
+    // This command accept no argument
+    if(arg != 0){
+        error(arg);
+        return;
+    }
 }
 
 void error(char *error){
@@ -91,4 +146,41 @@ void error(char *error){
     uart_sendc('"');
     uart_puts(" is not recognized");
 }
+
+// use to store the information of the board revision
+char* getBoardModel(int rev) {
+    switch(rev) {
+        case 0x0002: return "Model: Model B Rev 1\nRAM: 256MB\nRevision: none";
+        case 0x0003: return "Model: Model B Rev 1 (ECN0001, no fuses, D14 removed)\nRAM: 256MB\nRevision: none";
+        case 0x0004: case 0x0005: case 0x0006: return "Model: Model B Rev 2\nRAM: 256MB\nRevision: none";
+        case 0x0007: case 0x0008: case 0x0009: return "Model: Model A\nRAM: 256MB\nRevision: none";
+        case 0x000d: case 0x000e: case 0x000f: return "Model: Model B Rev 2\nRAM: 512MB\nRevision: none";
+        case 0x0010: case 0x0013: case 0x900032: return "Model: Model B+\nRAM: 512MB\nRevision: none";
+        case 0x0011: return "Model: Compute Module\nRAM: 512MB\nRevision: none";
+        case 0x0014: return "Model: Compute Module (Embest, China)\nRAM: 512MB\nRevision: none";
+        case 0x0012: return "Model: Model A+\nRAM: 256MB\nRevision: none";
+        case 0x0015: return "Model: Model A+ (Embest)\nRAM: 256MB or 512MB\nRevision: none";
+        case 0xa01041: return "Model: Pi 2 Model B v1.1 (Sony, UK)\nRAM: 1GB\nRevision: 1.1";
+        case 0xa21041: return "Model: Pi 2 Model B v1.1 (Embest, China)\nRAM: 1GB\nRevision: 1.1";
+        case 0xa22042: return "Model: Pi 2 Model B v1.2\nRAM: 1GB\nRevision: 1.2";
+        case 0x900092: return "Model: Pi Zero v1.2\nRAM: 512MB\nRevision: 1.2";
+        case 0x900093: return "Model: Pi Zero v1.3\nRAM: 512MB\nRevision: 1.3";
+        case 0x9000C1: return "Model: Pi Zero W\nRAM: 512MB\nRevision: 1.1";
+        case 0xa02082: return "Model: Pi 3 Model B (Sony, UK)\nRAM: 1GB\nRevision: 1.2";
+        case 0xa22082: return "Model: Pi 3 Model B (Embest, China)\nRAM: 1GB\nRevision: 1.2";
+        case 0xa020d3: return "Model: Pi 3 Model B+ (Sony, UK)\nRAM: 1GB\nRevision: 1.3";
+        case 0xa03111: return "Model: Pi 4 1GB v1.1 (Sony, UK)\nRAM: 1GB\nRevision: 1.1";
+        case 0xb03111: return "Model: Pi 4 2GB v1.1 (Sony, UK)\nRAM: 2GB\nRevision: 1.1";
+        case 0xb03112: return "Model: Pi 4 2GB v1.2 (Sony, UK)\nRAM: 2GB\nRevision: 1.2";
+        case 0xb03114: return "Model: Pi 4 2GB v1.4 (Sony, UK)\nRAM: 2GB\nRevision: 1.4";
+        case 0xc03111: return "Model: Pi 4 4GB v1.1 (Sony, UK)\nRAM: 4GB\nRevision: 1.1";
+        case 0xc03112: return "Model: Pi 4 4GB v1.2 (Sony, UK)\nRAM: 4GB\nRevision: 1.2";
+        case 0xc03114: return "Model: Pi 4 4GB v1.4 (Sony, UK)\nRAM: 4GB\nRevision: 1.4";
+        case 0xd03114: return "Model: Pi 4 8GB v1.4 (Sony, UK)\nRAM: 8GB\nRevision: 1.4";
+        case 0xc03130: return "Model: Pi 400 4GB v1.0\nRAM: 4GB\nRevision: 1.0";
+        case 0x902120: return "Model: Pi Zero 2 W 1GB v1.0\nRAM: 1GB\nRevision: 1.0";
+        default: return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
+    }
+}
+
 

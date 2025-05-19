@@ -11,5 +11,9 @@ void help(char* arg);
 void clear(char* arg);
 void braudRate(char* arg);
 void handShake(char* arg);
+void showInfo(char* arg);
+
+char* getBoardModel(int rev);
+
 
 void error(char *error);

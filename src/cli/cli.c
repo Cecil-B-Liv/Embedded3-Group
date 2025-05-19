@@ -9,6 +9,7 @@
 static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
 
+
 void cli_welcome(){
     uart_puts("==============================================================================================================\n\n");
     uart_puts("8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  \n");
@@ -40,6 +41,9 @@ void cli_process(){
     //Process the user input base on different case
     switch (c){
 
+        // User using autofill by pressing tab
+        case '\t':
+            break;
         // User press ENTER
         case '\n':
             // Call the commands processer function
