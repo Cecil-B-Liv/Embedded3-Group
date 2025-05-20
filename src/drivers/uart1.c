@@ -131,3 +131,13 @@ void uart_dec(int num)
 
 	uart_puts(str);
 }
+void uart_set_baudrate(int baudRate){
+    // stop transmitter and receiver
+    AUX_MU_CNTL = 0;
+
+    // set baud register directly
+    AUX_MU_BAUD = baudRate;
+
+    // restart transmitter and receiver
+    AUX_MU_CNTL = 3;
+}

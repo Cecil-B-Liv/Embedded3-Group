@@ -125,12 +125,43 @@ void showInfo(char* arg){
     }
 }
 void braudRate(char* arg){
-    // This command accept no argument
-    if(arg != 0){
-        error(arg);
-        return;
-    }
+    // if (!arg || arg[0] == '\0') {
+    //     uart_puts("\n[ERROR] No baud rate specified. Usage: baudrate <baud>\n");
+    //     return;
+    // }
+
+    // int baud = atoi(arg);
+    // if (baud <= 0) {
+    //     uart_puts("\n[ERROR] Invalid baud rate. Must be a positive number.\n");
+    //     return;
+    // }
+
+    // int allowed_bauds[] = {9600, 19200, 38400, 57600, 115200};
+    // int valid = 0;
+    // for (int i = 0; i < sizeof(allowed_bauds)/sizeof(int); i++) {
+    //     if (baud == allowed_bauds[i]) {
+    //         valid = 1;
+    //         break;
+    //     }
+    // }
+
+    // if (!valid) {
+    //     uart_puts("\n[ERROR] Baud rate not supported. Allowed rates: 9600, 19200, 38400, 57600, 115200\n");
+    //     return;
+    // }
+
+    // // Calculate baud register value here:
+    // // formula: baud_reg_val = (system_clk_freq / (baud * 8)) - 1
+    // // system_clk_freq = 250,000,000 (example)
+    // unsigned int baud_reg_val = (250000000 / (baud * 8)) - 1;
+
+    // uart_set_baudrate_register(baud_reg_val);
+
+    // uart_puts("\nBaud rate changed to ");
+    // uart_dec(baud);
+    // uart_puts("\n");
 }
+
 void handShake(char* arg){
     // This command accept no argument
     if(arg != 0){
