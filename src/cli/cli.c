@@ -1,6 +1,7 @@
 #include "../drivers/uart1.h"
 #include "cli.h"
 #include "commands.h"
+#include "../ultil/stringUltil.h"
 
 #define MAX_COMMAND_SIZE 100
 #define myOs "FixingGoodOS>"
@@ -8,6 +9,10 @@
 // Static varriable to keep track of the command buffer
 static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
+static char* commands[] = {"help", "clear", "showinfo", "braudRate", "handShake"};
+static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
+static char* matched = 0; // place holder for the matched checking
+static int matchedFound = 0; // Flag to check if matched found
 
 
 void cli_welcome(){
@@ -43,6 +48,33 @@ void cli_process(){
 
         // User using autofill by pressing tab
         case '\t':
+            // Loop to check the matched command 
+            for (int i = 0; i < NUM_COMMANDS; i++){
+                if (startsWith(commands[i], commandBuffer)){
+                    matched = commands[i];
+                    matchedFound = 1;
+                    break;
+                }
+            }
+
+            // If nothing matched then return
+            if (!matchedFound){
+                return;
+            }
+
+            // Clear the display
+            clearDisplay();
+
+            // clear the buffer
+            clearBuff(1);
+
+            // Promt the matched command;
+            for (int i = 0; matched[i] != '\0'; i++) {
+                commandBuffer[cbIndex++] = matched[i];
+                uart_sendc(matched[i]);
+            }
+            
+            matchedFound = 0; // reset the flag
             break;
         // User press ENTER
         case '\n':
@@ -50,7 +82,7 @@ void cli_process(){
             cmdProcess(commandBuffer);
 
             // Clear buffer after process the command 
-            clearBuff();
+            clearBuff(0);
             break;
         
         // User delete character
@@ -84,12 +116,24 @@ void cli_process(){
 }
 
 // Clear buffer and create now input line
-void clearBuff(){
+void clearBuff(int isTab){
   // Clear the command buffer and reset the index
     for (int i = 0; i < cbIndex; i++) {  
         commandBuffer[i] = '\0';
     }
     cbIndex = 0;
+
+    // if the function called in the tab then dont print the next os
+    if (isTab) return;
     uart_sendc('\n');
     uart_puts(myOs);
+}
+
+// clear all the visual inputed on the screen
+void clearDisplay(){
+    for (int i = 0; i < cbIndex; i++) {
+        uart_sendc('\b'); // move back
+        uart_sendc(' ');  // overwrite with space
+        uart_sendc('\b'); // move back again
+    }
 }

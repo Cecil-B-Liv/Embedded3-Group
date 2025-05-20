@@ -1,3 +1,4 @@
 void cli_welcome();
 void cli_process();
-void clearBuff();
+void clearBuff(int isTab);
+void clearDisplay();
