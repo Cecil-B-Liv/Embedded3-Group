@@ -5,14 +5,22 @@
 
 #define MAX_COMMAND_SIZE 100
 #define myOs "FixingGoodOS>"
+#define MAX_HISTORY 10
 
 // Static varriable to keep track of the command buffer
 static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
-static char* commands[] = {"help", "clear", "showinfo", "braudRate", "handShake"};
+
+// Tab function varriable
+static char* commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay"};
 static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
 static char* matched = 0; // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found
+
+// History varriable
+static char* history[MAX_HISTORY][MAX_COMMAND_SIZE];
+static int historyCount = 0;
+static int historyIndex = -1;
 
 
 void cli_welcome(){
@@ -81,8 +89,22 @@ void cli_process(){
             // Call the commands processer function
             cmdProcess(commandBuffer);
 
+            // Save to history
+            // if (historyCount < MAX_HISTORY) {
+            //         copyString(history[historyCount], commandBuffer);
+            //         historyCount++;
+            //     } else {
+            //         // Shift up and insert at end
+            //         for (int i = 1; i < MAX_HISTORY; i++) {
+            //             copyString(history[i - 1], history[i]);
+            //         }
+            //         copyString(history[MAX_HISTORY - 1], commandBuffer);
+            //     }
+            //     historyIndex = historyCount;
+
             // Clear buffer after process the command 
             clearBuff(0);
+            
             break;
         
         // User delete character

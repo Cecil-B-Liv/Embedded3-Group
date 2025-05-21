@@ -203,6 +203,15 @@ void drawLCircle(int center_x, int center_y, int radius, unsigned int attr, int 
     }
 }
 
+// Drawing the background
+void drawBackground(unsigned int color) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            drawPixelARGB32(x, y, color);
+        }
+    }
+}
+
 
 
 

@@ -2,15 +2,18 @@
 #include "../ultil/stringUltil.h"
 #include "../drivers/uart1.h"
 #include "../drivers/mbox.h"
+#include "../ultil/ultilsSap.h"
+#include "../drivers/framebf.h"
 
-#define MAX_COMMAND_NUMBER 5
+#define MAX_COMMAND_NUMBER 6
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
     { "help", "                       Show brief information of all commands", help},
     { "clear", "                      Clear screen", clear},
     { "showinfo", "                   Show board revision and board MAC address", showInfo},
     { "braudRate", "                  Allow the user to change the baudrate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", braudRate},
-    { "handShake", "                  Allow the user to turn on/off CTS/RTS handsharking", handShake}
+    { "handShake", "                  Allow the user to turn on/off CTS/RTS handsharking", handShake},
+    { "teamDisplay","                 Display all team members name on the screen", teamDisplay}
 };
 
 
@@ -211,6 +214,23 @@ char* getBoardModel(int rev) {
         case 0xc03130: return "Model: Pi 400 4GB v1.0\nRAM: 4GB\nRevision: 1.0";
         case 0x902120: return "Model: Pi Zero 2 W 1GB v1.0\nRAM: 1GB\nRevision: 1.0";
         default: return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
+    }
+}
+
+void teamDisplay(){
+    char *teamMembers[] = {
+    "\nKim Nhat Anh     s3978831",
+    "\nTran Quang Minh  s3988876",
+    "\nHuynh Ngoc Tai   s3978680",
+    "\nDiana Pham   "
+    };
+
+    drawBackground(0x00101010);
+    int y = 20;
+    unsigned int colors[] = {0x00FF0000, 0x0000FF00, 0x000000FF, 0x00FFFF00}; // red, green, blue, yellow
+    for (int i = 0; i < 4; i++) {
+        drawString(30, y, teamMembers[i], colors[i % 4], 2);
+        y += 20;
     }
 }
 

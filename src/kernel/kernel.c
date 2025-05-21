@@ -7,6 +7,9 @@ void main(){
     // set up serial console
 	uart_init();
 
+	// setup the framebuffer
+	framebf_init();
+	
 	// cli print message
 	cli_welcome();
 
