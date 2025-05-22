@@ -192,11 +192,33 @@ void baudRate(char *arg) {
     // uart_puts("\n");
 }
 
-void handShake(char *arg) {
+void handShakeSend(char *arg) {
     // This command accept no argument
     if (arg != 0) {
         error(arg);
         return;
+    }
+
+    uart_puts("HELLO\n");  // Send greeting
+    uart_puts("[WAITING FOR RETERN]\n");
+
+    char buf[8] = {0};
+    int i = 0;
+
+    while (1) {
+        char c = uart_getc();  // Blocking read
+        if (c == '\n') {
+            buf[i] = '\0';
+            if (strComp(buf, "RETURN")) {
+                uart_puts("[RETURN RECEIVED] Starting...\n");
+                break;
+            } else {
+                uart_puts("[INVALID RESPONSE] Retrying...\n");
+                i = 0;
+            }
+        } else if (i < 7) {
+            buf[i++] = c;
+        }
     }
 }
 
