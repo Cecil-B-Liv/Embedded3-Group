@@ -12,7 +12,7 @@ static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
 
 // Tab function varriable
-static char *commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay"};
+static char *commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay", "videoDisplay"};
 static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
 static char *matched = 0; // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found
@@ -136,9 +136,7 @@ void cli_process() {
             cbIndex--;
             commandBuffer[cbIndex] = '\0';
             break;
-        case 't':
-            videoDisplay();
-            break;
+            
         // Normal input
         default:
             // Maximum command size reached

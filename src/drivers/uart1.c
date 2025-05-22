@@ -132,20 +132,20 @@ void uart_dec(int num) {
 }
 
 void uart_set_baudrate(int baudrate) {
-    unsigned int CLOCK = 250000000;
-    float div = (float) CLOCK / ((8 * baudrate) - 1);
-    result = (unsigned int) div;
-    // stop transmitter and receiver
-    AUX_MU_CNTL = 0;
+//     unsigned int CLOCK = 250000000;
+//     float div = (float) CLOCK / ((8 * baudrate) - 1);
+//     result = (unsigned int) div;
+//     // stop transmitter and receiver
+//     AUX_MU_CNTL = 0;
 
-    // set baud register directly
-    AUX_MU_BAUD = baudRate;
+//     // set baud register directly
+//     AUX_MU_BAUD = baudRate;
 
-    // restart transmitter and receiver
-    AUX_MU_CNTL = 3;
-}
+//     // restart transmitter and receiver
+//     AUX_MU_CNTL = 3;
+// }
 
-unsigned int uart_get_baudrate() {
-    unsigned int baud = 250000000 / (8 * (AUX_MU_BAUD + 1));
-    return baud;
+// unsigned int uart_get_baudrate() {
+//     unsigned int baud = 250000000 / (8 * (AUX_MU_BAUD + 1));
+//     return baud;
 }

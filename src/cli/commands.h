@@ -23,6 +23,6 @@ char *getBoardModel(int rev);
 void error(char *error);
 
 void teamDisplay();
-void videoDisplay();
+void videoDisplay(char *arg);
 
 void getBaud();
