@@ -283,10 +283,10 @@ char *getBoardModel(int rev) {
 
 void teamDisplay() {
     char *teamMembers[] = {
-            "\nKim Nhat Anh     s3978831",
-            "\nTran Quang Minh  s3988876",
-            "\nHuynh Ngoc Tai   s3978680",
-            "\nDiana Pham   "
+            "\nKim Nhat Anh         s3978831",
+            "\nTran Quang Minh      s3988876",
+            "\nHuynh Ngoc Tai       s3978680",
+            "\nVu Thien Minh Hao    s3938011" // add name
     };
 
     drawBackground(0x00101010);
@@ -306,7 +306,7 @@ void videoDisplay(char *arg){
     }
 
     for (int i = 0; i <= 30; i++){
-        drawImg(VIDEO_ARRAY[i], 0, 0, 600, 338);
+        drawImg(VIDEO_ARRAY[i], 0, 0, 1024, 768);
         delay_ms(50);
     }
 }

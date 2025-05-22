@@ -52,7 +52,7 @@ void cli_welcome() {
     uart_puts("  - Kim Nhat Anh       | ID: s3978831\r\n");
     uart_puts("  - Huynh Ngoc Tai     | ID: s3978680\r\n");
     uart_puts("  - Tran Quang Minh    | ID: s3988776\r\n");
-    uart_puts("  - asdfadfasdf        | ID: 111111111\r\n");
+    uart_puts("  - Vu Thien Minh Hao  | ID: s3938011\r\n");
     uart_puts(
             "==============================================================================================================\n");
     uart_puts("\n");

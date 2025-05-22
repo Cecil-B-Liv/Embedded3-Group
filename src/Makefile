@@ -22,10 +22,12 @@ kernel8.img: ./build/boot.o $(OFILES)
 	aarch64-none-elf-ld -nostdlib $^ -T ./kernel/link.ld -o ./build/kernel8.elf
 	aarch64-none-elf-objcopy -O binary ./build/kernel8.elf kernel8.img
 
-# Clean target
+# Clean target 
 clean:
-	rm -f .\build\kernel8.elf .\build\*.o *.img
+# rm -f .\build\kernel8.elf .\build\*.o *.img
+	del .\build\kernel8.elf .\build\*.o *.img
 
 # Run with QEMU
 run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio
+# qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio
+	qemu-system-aarch64 -M raspi3 -kernel kernel8.img -serial null -serial stdio
