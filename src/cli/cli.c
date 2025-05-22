@@ -12,53 +12,65 @@ static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
 
 // Tab function varriable
-static char* commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay"};
+static char *commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay"};
 static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
-static char* matched = 0; // place holder for the matched checking
+static char *matched = 0; // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found
 
 // History varriable
-static char* history[MAX_HISTORY][MAX_COMMAND_SIZE];
+static char *history[MAX_HISTORY][MAX_COMMAND_SIZE];
 static int historyCount = 0;
 static int historyIndex = -1;
 
 
-void cli_welcome(){
-    uart_puts("==============================================================================================================\n\n");
-    uart_puts("8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  \n");
-    uart_puts("888          888    Y88b d88P    888   8888b   888 d88P  Y88b    d88P  Y88b d88P   Y88b d88P   Y88b 888   Y88b \n");
-    uart_puts("888          888     Y88o88P     888   88888b  888 888    888    888    888 888     888 888     888 888    888 \n");
-    uart_puts("8888888      888      Y888P      888   888Y88b 888 888           888        888     888 888     888 888    888 \n");
-    uart_puts("888          888      d888b      888   888 Y88b888 888  88888    888  88888 888     888 888     888 888    888 \n");
-    uart_puts("888          888     d88888b     888   888  Y88888 888    888    888    888 888     888 888     888 888    888 \n");
-    uart_puts("888          888    d88P Y88b    888   888   Y8888 Y88b  d88P    Y88b  d88P Y88b. .d88P Y88b. .d88P 888  .d88P \n");
-    uart_puts("888        8888888 d88P   Y88b 8888888 888    Y888  Y8888P88      Y8888P88   Y88888P      Y88888P   8888888P   \n");
+void cli_welcome() {
+    uart_puts(
+            "==============================================================================================================\n\n");
+    uart_puts(
+            "8888888888 8888888 Y88b   d88P 8888888 888b    888  .d8888b.      .d8888b.   .d88888b.   .d88888b.  8888888b.  \n");
+    uart_puts(
+            "888          888    Y88b d88P    888   8888b   888 d88P  Y88b    d88P  Y88b d88P   Y88b d88P   Y88b 888   Y88b \n");
+    uart_puts(
+            "888          888     Y88o88P     888   88888b  888 888    888    888    888 888     888 888     888 888    888 \n");
+    uart_puts(
+            "8888888      888      Y888P      888   888Y88b 888 888           888        888     888 888     888 888    888 \n");
+    uart_puts(
+            "888          888      d888b      888   888 Y88b888 888  88888    888  88888 888     888 888     888 888    888 \n");
+    uart_puts(
+            "888          888     d88888b     888   888  Y88888 888    888    888    888 888     888 888     888 888    888 \n");
+    uart_puts(
+            "888          888    d88P Y88b    888   888   Y8888 Y88b  d88P    Y88b  d88P Y88b. .d88P Y88b. .d88P 888  .d88P \n");
+    uart_puts(
+            "888        8888888 d88P   Y88b 8888888 888    Y888  Y8888P88      Y8888P88   Y88888P      Y88888P   8888888P   \n");
     uart_puts("\r\n");
 
-    uart_puts("==============================================================================================================\n");
+    uart_puts(
+            "==============================================================================================================\n");
     uart_puts("                                          Developer Team\r\n");
-    uart_puts("--------------------------------------------------------------------------------------------------------------\n");
+    uart_puts(
+            "--------------------------------------------------------------------------------------------------------------\n");
     uart_puts("  - Kim Nhat Anh       | ID: s3978831\r\n");
     uart_puts("  - Huynh Ngoc Tai     | ID: s3978680\r\n");
     uart_puts("  - Tran Quang Minh    | ID: s3988776\r\n");
     uart_puts("  - asdfadfasdf        | ID: 111111111\r\n");
-    uart_puts("==============================================================================================================\n");
+    uart_puts(
+            "==============================================================================================================\n");
     uart_puts("\n");
     uart_puts(myOs);
 }
 
-void cli_process(){
+void cli_process() {
     // Get the user input
     char c = uart_getc();
 
     //Process the user input base on different case
-    switch (c){
+    switch (c) {
 
         // User using autofill by pressing tab
         case '\t':
             // Loop to check the matched command 
-            for (int i = 0; i < NUM_COMMANDS; i++){
-                if (startsWith(commands[i], commandBuffer)){
+            for (int i = 0; i < NUM_COMMANDS; i++) {
+                if (startsWith(commands[i], commandBuffer)) {
                     matched = commands[i];
                     matchedFound = 1;
                     break;
@@ -66,7 +78,7 @@ void cli_process(){
             }
 
             // If nothing matched then return
-            if (!matchedFound){
+            if (!matchedFound) {
                 return;
             }
 
@@ -81,10 +93,10 @@ void cli_process(){
                 commandBuffer[cbIndex++] = matched[i];
                 uart_sendc(matched[i]);
             }
-            
+
             matchedFound = 0; // reset the flag
             break;
-        // User press ENTER
+            // User press ENTER
         case '\n':
             // Call the commands processer function
             cmdProcess(commandBuffer);
@@ -104,13 +116,14 @@ void cli_process(){
 
             // Clear buffer after process the command 
             clearBuff(0);
-            
+
             break;
-        
-        // User delete character
+
+            // User delete character
+        case 127:
         case '\b':
             // Nothing to delete
-            if (cbIndex == 0){ 
+            if (cbIndex == 0) {
                 break;
             }
 
@@ -129,7 +142,7 @@ void cli_process(){
         // Normal input
         default:
             // Maximum command size reached
-            if (cbIndex > MAX_COMMAND_SIZE - 1){
+            if (cbIndex > MAX_COMMAND_SIZE - 1) {
                 break; // do nothing
             }
             // Add the new character to the buffer
@@ -141,9 +154,9 @@ void cli_process(){
 }
 
 // Clear buffer and create now input line
-void clearBuff(int isTab){
-  // Clear the command buffer and reset the index
-    for (int i = 0; i < cbIndex; i++) {  
+void clearBuff(int isTab) {
+    // Clear the command buffer and reset the index
+    for (int i = 0; i < cbIndex; i++) {
         commandBuffer[i] = '\0';
     }
     cbIndex = 0;
@@ -155,7 +168,7 @@ void clearBuff(int isTab){
 }
 
 // clear all the visual inputed on the screen
-void clearDisplay(){
+void clearDisplay() {
     for (int i = 0; i < cbIndex; i++) {
         uart_sendc('\b'); // move back
         uart_sendc(' ');  // overwrite with space

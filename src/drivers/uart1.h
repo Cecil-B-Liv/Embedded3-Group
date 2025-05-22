@@ -16,9 +16,17 @@
 
 /* Function prototypes */
 void uart_init();
+
 void uart_sendc(char c);
+
 char uart_getc();
+
 void uart_puts(char *s);
+
 void uart_hex(unsigned int num);
+
 void uart_dec(int num);
-void uart_set_baudrate(int baudRate);
+
+void uart_set_baudrate(int baudrate);
+
+unsigned int uart_get_baudrate();

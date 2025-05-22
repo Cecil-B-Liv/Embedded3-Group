@@ -20,9 +20,10 @@ unsigned char *fb;
 /**
  * Set screen resolution to 1024x768
  */
-void framebf_init()
-{
-    mBuf[0] = 35*4; // Length of message in bytes
+void framebf_init() {
+    // Note: make it works for MAC
+//    volatile unsigned int __attribute__((aligned(16))) mBuf[36];
+    mBuf[0] = 35 * 4; // Length of message in bytes
     mBuf[1] = MBOX_REQUEST;
 
     mBuf[2] = MBOX_TAG_SETPHYWH; //Set physical width-height
@@ -68,21 +69,23 @@ void framebf_init()
 
     // Call Mailbox
     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP) //mailbox call is successful ?
-    	&& mBuf[20] == COLOR_DEPTH //got correct color depth ?
-		&& mBuf[24] == PIXEL_ORDER //got correct pixel order ?
-		&& mBuf[28] != 0 //got a valid address for frame buffer ?
-		) {
+        && mBuf[20] == COLOR_DEPTH //got correct color depth ?
+        && mBuf[24] == PIXEL_ORDER //got correct pixel order ?
+        && mBuf[28] != 0 //got a valid address for frame buffer ?
+        && mBuf[5] == 1024
+        && mBuf[6] == 768
+            ) {
 
-    	/* Convert GPU address to ARM address (clear higher address bits)
-    	 * Frame Buffer is located in RAM memory, which VideoCore MMU
-    	 * maps it to bus address space starting at 0xC0000000.
-    	 * Software accessing RAM directly use physical addresses
-    	 * (based at 0x00000000)
-    	*/
-    	mBuf[28] &= 0x3FFFFFFF;
+        /* Convert GPU address to ARM address (clear higher address bits)
+         * Frame Buffer is located in RAM memory, which VideoCore MMU
+         * maps it to bus address space starting at 0xC0000000.
+         * Software accessing RAM directly use physical addresses
+         * (based at 0x00000000)
+        */
+        mBuf[28] &= 0x3FFFFFFF;
 
         // Access frame buffer as 1 byte per each address
-        fb = (unsigned char *)((unsigned long)mBuf[28]);
+        fb = (unsigned char *) ((unsigned long) mBuf[28]);
         uart_puts("Got allocated Frame Buffer at RAM physical address: ");
         uart_hex(mBuf[28]);
         uart_puts("\n");
@@ -91,19 +94,18 @@ void framebf_init()
         uart_dec(mBuf[29]);
         uart_puts("\n");
 
-        width = mBuf[5];     	// Actual physical width
-        height = mBuf[6];     	// Actual physical height
+        width = mBuf[5];        // Actual physical width
+        height = mBuf[6];        // Actual physical height
         pitch = mBuf[33];       // Number of bytes per line
 
     } else {
-    	uart_puts("Unable to get a frame buffer with provided setting\n");
+        uart_puts("Unable to get a frame buffer with provided setting\n");
     }
 }
 
 
-void drawPixelARGB32(int x, int y, unsigned int attr)
-{
-	int offs = (y * pitch) + (COLOR_DEPTH/8 * x);
+void drawPixelARGB32(int x, int y, unsigned int attr) {
+    int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
 
 /*	//Access and assign each byte
     *(fb + offs    ) = (attr >> 0 ) & 0xFF; //BLUE  (get the least significant byte)
@@ -112,30 +114,26 @@ void drawPixelARGB32(int x, int y, unsigned int attr)
     *(fb + offs + 3) = (attr >> 24) & 0xFF; //ALPHA
 */
 
-	//Access 32-bit together
-	*((unsigned int*)(fb + offs)) = attr;
+    //Access 32-bit together
+    *((unsigned int *) (fb + offs)) = attr;
 }
 
 
-void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
-{
-	for (int y = y1; y <= y2; y++ )
-		for (int x = x1; x <= x2; x++) {
-			if ((x == x1 || x == x2) || (y == y1 || y == y2))
-				drawPixelARGB32(x, y, attr);
-			else if (fill)
-				drawPixelARGB32(x, y, attr);
-		}
+void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill) {
+    for (int y = y1; y <= y2; y++)
+        for (int x = x1; x <= x2; x++) {
+            if ((x == x1 || x == x2) || (y == y1 || y == y2))
+                drawPixelARGB32(x, y, attr);
+            else if (fill)
+                drawPixelARGB32(x, y, attr);
+        }
 }
-
-
 
 
 // Function to draw line
-void drawLine(int x1, int y1, int x2, int y2, unsigned int attr)
-{
-	for (int x = x1; x <= x2; x++ ){
-        int y = (float)(y1 - y2)/(x1 - x2)*(x - x1) + y1;
+void drawLine(int x1, int y1, int x2, int y2, unsigned int attr) {
+    for (int x = x1; x <= x2; x++) {
+        int y = (float) (y1 - y2) / (x1 - x2) * (x - x1) + y1;
         drawPixelARGB32(x, y, attr);
     }
 }
@@ -146,34 +144,33 @@ double sqrt(double number) {
     if (number < 0) {
         return -1; // Return -1 for negative inputs as square root of negative is not defined in real numbers
     }
-    
+
     double tolerance = 0.000001; // Define the tolerance for the result
     double guess = number / 2.0; // Initial guess (can be any positive number, here half of the number)
     double result = 0.0;
-    
+
     while (1) {
         result = 0.5 * (guess + number / guess); // Calculate the next approximation
-        
+
         // Check if the difference between the current guess and the new result is within the tolerance
         int diff = (result > guess) ? (result - guess) : (guess - result);
         if (diff < tolerance) {
             break;
         }
-        
+
         guess = result; // Update the guess for the next iteration
     }
-    
+
     return result;
 }
 
 
 // Function to draw circle
-void drawLCircle(int center_x, int center_y, int radius, unsigned int attr, int fill)
-{
+void drawLCircle(int center_x, int center_y, int radius, unsigned int attr, int fill) {
     //Draw the circle when going on x side
     for (int x = center_x - radius; x <= center_x + radius; x++) {
         // Calculate the corresponding y values using the circle equation
-        int dy = sqrt(radius * radius - (x - center_x) * (x - center_x)); 
+        int dy = sqrt(radius * radius - (x - center_x) * (x - center_x));
         int upper_y = center_y + dy;
         int lower_y = center_y - dy;
 
@@ -193,7 +190,7 @@ void drawLCircle(int center_x, int center_y, int radius, unsigned int attr, int 
 
     for (int y = center_y - radius; y <= center_y + radius; y++) {
         // Calculate the corresponding x values using the circle equation
-        int dx = sqrt(radius * radius - (y - center_y) * (y - center_y)); 
+        int dx = sqrt(radius * radius - (y - center_y) * (y - center_y));
 
         int left_x = center_x - dx;
         int right_x = center_x + dx;

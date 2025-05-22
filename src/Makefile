@@ -24,8 +24,8 @@ kernel8.img: ./build/boot.o $(OFILES)
 
 # Clean target
 clean:
-	del .\build\kernel8.elf .\build\*.o *.img
+	rm -f .\build\kernel8.elf .\build\*.o *.img
 
 # Run with QEMU
 run:
-	qemu-system-aarch64 -M raspi3 -kernel kernel8.img -serial null -serial stdio
+	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial null -serial stdio
