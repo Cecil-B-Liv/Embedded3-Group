@@ -14,13 +14,13 @@
 #define MAX_COMMAND_NUMBER 7
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
-        {"help",        "                 Show brief information of all commands",                                                                                                     help},
-        {"clear",       "                 Clear screen",                                                                                                                                clear},
-        {"showinfo",    "                 Show board revision and board MAC address",                                                                                                      showInfo},
-        {"baudRate",    "                 Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
-        {"handShake",   "                 Allow the user to turn on/off CTS/RTS handshaking",                                                                                               handShake},
-        {"teamDisplay", "                 Display all team members name on the screen",                                                                                                      teamDisplay},
-        {"videoDisplay", "                 Display the video", videoDisplay}
+        {"help",         "                 Show brief information of all commands",                                                                                                          help},
+        {"clear",        "                 Clear screen",                                                                                                                                    clear},
+        {"showinfo",     "                 Show board revision and board MAC address",                                                                                                       showInfo},
+        {"baudRate",     "                 Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
+        {"handShake",    "                 Allow the user to turn on/off CTS/RTS handshaking",                                                                                               handShake},
+        {"teamDisplay",  "                 Display all team members name on the screen",                                                                                                     teamDisplay},
+        {"videoDisplay", "                 Display the video",                                                                                                                               videoDisplay}
 };
 
 
@@ -298,15 +298,15 @@ void teamDisplay() {
     }
 }
 
-void videoDisplay(char *arg){
-     // This command accept no argument
+void videoDisplay(char *arg) {
+    // This command accept no argument
     if (arg != 0) {
         error(arg);
         return;
     }
 
-    for (int i = 0; i <= 30; i++){
-        drawImg(VIDEO_ARRAY[i], 0, 0, 1024, 768);
-        delay_ms(50);
+    for (int i = 0; i <= 30; i++) {
+        drawImg(VIDEO_ARRAY[i], 0, 0, 600, 338);
+        delay_ms(32);
     }
 }
