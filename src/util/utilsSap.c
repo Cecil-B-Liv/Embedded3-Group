@@ -2,7 +2,7 @@
 #include "fontSap.h"
 #include "../drivers/framebf.h"
 #include "../drivers/uart1.h"
-#include "ultilsSap.h"
+#include "utilsSap.h"
 
 /* Functions to display text on the screen */
 // NOTE: zoom = 0 will not display the character

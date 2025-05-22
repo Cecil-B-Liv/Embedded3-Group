@@ -1,8 +1,8 @@
 #include "commands.h"
 
-#include "../ultil/stringUltil.h"
-#include "../ultil/time.h"
-#include "../ultil/ultilsSap.h"
+#include "../util/stringUtil.h"
+#include "../util/time.h"
+#include "../util/utilsSap.h"
 
 #include "../drivers/uart1.h"
 #include "../drivers/mbox.h"
@@ -154,7 +154,8 @@ void baudRate(char *arg) {
         case 38400:
         case 57600:
         case 115200:
-            uart_init(baud);
+            uart_puts("\nWas using: ");
+            uart_dec(uart_get_baudrate());
             uart_puts("\nBaud rate set successfully.\n");
             uart_puts("Now using ");
             uart_dec(baud);
@@ -299,14 +300,13 @@ void teamDisplay() {
 }
 
 void videoDisplay(char *arg) {
-    // This command accept no argument
     if (arg != 0) {
         error(arg);
         return;
     }
 
     for (int i = 0; i <= 30; i++) {
-        drawImg(VIDEO_ARRAY[i], 0, 0, 600, 338);
-        delay_ms(32);
+        drawImg(VIDEO_ARRAY[i], 0, 0, 1024, 768);
+        delay_ms(32);  // 1000 ms / 31 frames ≈ 32 ms per frame
     }
 }

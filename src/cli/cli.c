@@ -1,7 +1,7 @@
 #include "../drivers/uart1.h"
 #include "cli.h"
 #include "commands.h"
-#include "../ultil/stringUltil.h"
+#include "../util/stringUtil.h"
 
 #define MAX_COMMAND_SIZE 100
 #define myOs "FixingGoodOS>"

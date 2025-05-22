@@ -5,7 +5,7 @@
 
 void main() {
     // set up serial console
-    uart_init(115200);
+    uart_init();
 
     // setup the framebuffer
     framebf_init();

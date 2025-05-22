@@ -8,6 +8,8 @@
 
 //Pixel Order: BGR in memory order (little endian --> RGB in byte order)
 #define PIXEL_ORDER 0
+#define HEIGHT 768
+#define WIDTH 1024
 
 //Screen info
 unsigned int width, height, pitch;
@@ -21,22 +23,20 @@ unsigned char *fb;
  * Set screen resolution to 1024x768
  */
 void framebf_init() {
-    // Note: make it works for MAC
-//    volatile unsigned int __attribute__((aligned(16))) mBuf[36];
     mBuf[0] = 35 * 4; // Length of message in bytes
     mBuf[1] = MBOX_REQUEST;
 
     mBuf[2] = MBOX_TAG_SETPHYWH; //Set physical width-height
     mBuf[3] = 8; // Value size in bytes
     mBuf[4] = 0; // REQUEST CODE = 0
-    mBuf[5] = 1024; // Value(width)
-    mBuf[6] = 768; // Value(height)
+    mBuf[5] = WIDTH; // Value(width)
+    mBuf[6] = HEIGHT; // Value(height)
 
     mBuf[7] = MBOX_TAG_SETVIRTWH; //Set virtual width-height
     mBuf[8] = 8;
     mBuf[9] = 0;
-    mBuf[10] = 1024;
-    mBuf[11] = 768;
+    mBuf[10] = WIDTH;
+    mBuf[11] = HEIGHT;
 
     mBuf[12] = MBOX_TAG_SETVIRTOFF; //Set virtual offset
     mBuf[13] = 8;
@@ -72,8 +72,8 @@ void framebf_init() {
         && mBuf[20] == COLOR_DEPTH //got correct color depth ?
         && mBuf[24] == PIXEL_ORDER //got correct pixel order ?
         && mBuf[28] != 0 //got a valid address for frame buffer ?
-        && mBuf[5] == 1024
-        && mBuf[6] == 768
+        && mBuf[5] == WIDTH
+        && mBuf[6] == HEIGHT
             ) {
 
         /* Convert GPU address to ARM address (clear higher address bits)
@@ -210,8 +210,8 @@ void drawBackground(unsigned int color) {
 }
 
 // Draw img to test
-void drawImg(int pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height){
-    for (int i = 0; i <= pic_width*pic_height; i++){
+void drawImg(int pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height) {
+    for (int i = 0; i <= pic_width * pic_height; i++) {
         int x = pos_x + (i % pic_width);
         int y = pos_y + (i / pic_width);
         drawPixelARGB32(x, y, pixel_data[i]);
