@@ -3,18 +3,18 @@
 #include "../drivers/framebf.h"
 #include "../cli/cli.h"
 
-void main(){
+void main() {
     // set up serial console
-	uart_init();
+    uart_init(115200);
 
-	// setup the framebuffer
-	framebf_init();
-	
-	// cli print message
-	cli_welcome();
+    // setup the framebuffer
+    framebf_init();
 
-	// CLI processing
-	while (1){
-		cli_process();
-	}
+    // cli print message
+    cli_welcome();
+
+    // CLI processing
+    while (1) {
+        cli_process();
+    }
 }
