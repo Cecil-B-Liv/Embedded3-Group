@@ -19,3 +19,4 @@ char* getBoardModel(int rev);
 void error(char *error);
 
 void teamDisplay();
+void videoDisplay();

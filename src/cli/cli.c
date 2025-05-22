@@ -123,6 +123,9 @@ void cli_process(){
             cbIndex--;
             commandBuffer[cbIndex] = '\0';
             break;
+        case 't':
+            videoDisplay();
+            break;
         // Normal input
         default:
             // Maximum command size reached

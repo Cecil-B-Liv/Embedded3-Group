@@ -4,6 +4,7 @@
 #include "../drivers/mbox.h"
 #include "../ultil/ultilsSap.h"
 #include "../drivers/framebf.h"
+#include "../assets/testImg.h"
 
 #define MAX_COMMAND_NUMBER 6
 
@@ -234,4 +235,6 @@ void teamDisplay(){
     }
 }
 
-
+void videoDisplay(){
+    drawImg(IMG, 0, 0, 640, 706);
+}
