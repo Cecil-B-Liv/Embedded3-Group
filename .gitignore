@@ -31,4 +31,4 @@
 *.out
 *.app
 
-src.zip
+./src/build/
