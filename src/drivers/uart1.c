@@ -14,7 +14,7 @@ void uart_init() {
     AUX_MU_IIR = 0xc6;  //enable and clear FIFOs
     AUX_MU_BAUD = 270;   //configure 115200 baud rate [system_clk_freq/(baud_rate*8) - 1]
 
-    /* Note: refer to page 11 of ARM Peripherals guide for baudrate configuration 
+    /* Note: refer to page 11 of ARM Peripherals guide for baudrate configuration
     (system_clk_freq is 250MHz by default) */
 
     /* map UART1 to GPIO pins 14 and 15 */
@@ -68,7 +68,7 @@ char uart_getc() {
     } while (!(AUX_MU_LSR & 0x01));
 
     // read it and return
-    c = (unsigned char) (AUX_MU_IO);
+    c = (unsigned char)(AUX_MU_IO);
 
     // convert carriage return to newline character
     return (c == '\r' ? '\n' : c);
@@ -77,7 +77,7 @@ char uart_getc() {
 /**
  * Display a string
  */
-void uart_puts(char *s) {
+void uart_puts(char* s) {
     while (*s) {
         // convert newline to carriage return + newline
         if (*s == '\n')
@@ -110,7 +110,7 @@ void uart_hex(unsigned int num) {
 */
 void uart_dec(int num) {
     //A string to store the digit characters
-    char str[33] = {0};
+    char str[33] = { 0 };
 
     //Calculate the number of digits
     int len = 1;
@@ -132,20 +132,12 @@ void uart_dec(int num) {
 }
 
 void uart_set_baudrate(int baudrate) {
-//     unsigned int CLOCK = 250000000;
-//     float div = (float) CLOCK / ((8 * baudrate) - 1);
-//     result = (unsigned int) div;
-//     // stop transmitter and receiver
-//     AUX_MU_CNTL = 0;
+    unsigned int CLOCK = 250000000;
+    float div = (float)CLOCK / ((8 * baudrate) - 1);
+    unsigned int result = (unsigned int)div;
+    // stop transmitter and receiver
+    AUX_MU_CNTL = 0;
 
-//     // set baud register directly
-//     AUX_MU_BAUD = baudRate;
-
-//     // restart transmitter and receiver
-//     AUX_MU_CNTL = 3;
-// }
-
-// unsigned int uart_get_baudrate() {
-//     unsigned int baud = 250000000 / (8 * (AUX_MU_BAUD + 1));
-//     return baud;
+    // set baud register directly
+    AUX_MU_BAUD = result;
 }
