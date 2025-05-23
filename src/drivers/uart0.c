@@ -219,4 +219,18 @@ int *caculate_IBRD(int baudrate)
     return BR;
 }
 
+void uart_mac_formater(unsigned int num)
+{
+    for (int pos = 4; pos >= 0; pos = pos - 4)
+    {
+        // Get highest 4-bit nibble
+        char digit = (num >> pos) & 0xF;
+
+        // Convert to ASCII code
+        digit += (digit > 9) ? (-10 + 'A') : '0';
+
+        uart_sendc(digit); // Send the character
+    }
+}
+
 #endif

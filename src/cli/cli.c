@@ -56,64 +56,45 @@ void cli_process() {
     //Process the user input base on different case
     switch (c) {
 
-        // User using autofill by pressing tab
-        case '\t':
-            // Loop to check the matched command 
-            for (int i = 0; i < NUM_COMMANDS; i++) {
-                if (startsWith(commands[i], commandBuffer)) {
-                    matched = commands[i];
-                    matchedFound = 1;
-                    break;
-                }
-            }
-
-            // If nothing matched then return
-            if (!matchedFound) {
-                return;
-            }
-
-            // Clear the display
+    case '-': // Go backward in history
+        if (historyIndex > 0)
+        {
+            historyIndex--;
             clearDisplay();
-
-            // clear the buffer
             clearBuff(1);
+            strCopy(commandBuffer, history[historyIndex]);
+            cbIndex = strLen(commandBuffer);
+            uart_puts(commandBuffer);
+        }
+        break;
 
-            // Promt the matched command;
-            for (int i = 0; matched[i] != '\0'; i++) {
-                commandBuffer[cbIndex++] = matched[i];
-                uart_sendc(matched[i]);
-            }
+    case '=': // Go forward in history
+        if (historyIndex < historyCount - 1)
+        {
+            historyIndex++;
+            clearDisplay();
+            clearBuff(1);
+            strCopy(commandBuffer, history[historyIndex]);
+            cbIndex = strLen(commandBuffer);
+            uart_puts(commandBuffer);
+        }
+        else
+        {
+            // Clear input if at the end
+            clearDisplay();
+            clearBuff(1);
+        }
+        break;
 
-            matchedFound = 0; // reset the flag
-            break;
-            // User press ENTER
-        case '\n':
-            // Call the commands processer function
-            cmdProcess(commandBuffer);
-
-            // Save to history
-            // if (historyCount < MAX_HISTORY) {
-            //         copyString(history[historyCount], commandBuffer);
-            //         historyCount++;
-            //     } else {
-            //         // Shift up and insert at end
-            //         for (int i = 1; i < MAX_HISTORY; i++) {
-            //             copyString(history[i - 1], history[i]);
-            //         }
-            //         copyString(history[MAX_HISTORY - 1], commandBuffer);
-            //     }
-            //     historyIndex = historyCount;
-
-            // Clear buffer after process the command 
-            clearBuff(0);
-
-            break;
-
-            // User delete character
-        case 127:
-        case '\b':
-            // Nothing to delete
-            if (cbIndex == 0) {
+    // User using autofill by pressing tab
+    case '\t':
+        // Loop to check the matched command
+        for (int i = 0; i < NUM_COMMANDS; i++)
+        {
+            if (startsWith(commands[i], commandBuffer))
+            {
+                matched = commands[i];
+                matchedFound = 1;
                 break;
             }
 
@@ -122,22 +103,77 @@ void cli_process() {
             uart_sendc(' ');
             uart_sendc('\b');
 
-            // Modify the buffer
-            cbIndex--;
-            commandBuffer[cbIndex] = '\0';
-            break;
+        // Clear the display
+        clearDisplay();
 
-            // Normal input
-        default:
-            // Maximum command size reached
-            if (cbIndex > MAX_COMMAND_SIZE - 1) {
-                break; // do nothing
+        // clear the buffer
+        clearBuff(1);
+
+        // Promt the matched command;
+        for (int i = 0; matched[i] != '\0'; i++)
+        {
+            commandBuffer[cbIndex++] = matched[i];
+            uart_sendc(matched[i]);
+        }
+
+        matchedFound = 0; // reset the flag
+        break;
+        // User press ENTER
+    case '\n':
+        // Call the commands processer function
+        cmdProcess(commandBuffer);
+
+        if (cbIndex > 0)
+        {
+            if (historyCount < MAX_HISTORY)
+            {
+                strCopy(history[historyCount++], commandBuffer);
             }
-            // Add the new character to the buffer
-            commandBuffer[cbIndex] = c;
-            cbIndex++;
-            // Print the user input to the terminal
-            uart_sendc(c);
+            else
+            {
+                for (int i = 1; i < MAX_HISTORY; i++)
+                {
+                    strCopy(history[i - 1], history[i]);
+                }
+                strCopy(history[MAX_HISTORY - 1], commandBuffer);
+            }
+        }
+        historyIndex = historyCount;
+        clearBuff(0);
+
+        break;
+
+        // User delete character
+    case 127:
+    case '\b':
+        // Nothing to delete
+        if (cbIndex == 0)
+        {
+            break;
+        }
+
+        // Visual display delete for user
+        uart_sendc('\b');
+        uart_sendc(' ');
+        uart_sendc('\b');
+
+        // Modify the buffer
+        cbIndex--;
+        commandBuffer[cbIndex] = '\0';
+        break;
+
+        // Normal input
+    default:
+        // Maximum command size reached
+        if (cbIndex > MAX_COMMAND_SIZE - 1)
+        {
+            break; // do nothing
+        }
+        // Add the new character to the buffer
+        commandBuffer[cbIndex] = c;
+        cbIndex++;
+        // Print the user input to the terminal
+        uart_sendc(c);
     }
 }
 

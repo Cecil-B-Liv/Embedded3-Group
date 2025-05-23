@@ -170,5 +170,6 @@ void uart_hex(unsigned int num);
 void uart_dec(int num);
 int *caculate_IBRD(int baudrate);
 void uart_setBaudrate(int baudrate);
+void uart_mac_formater(unsigned int num);
 
 #endif // EMBEDDED3_GROUP_UART0_H
