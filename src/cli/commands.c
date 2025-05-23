@@ -303,21 +303,31 @@ char *getBoardModel(int rev) {
     }
 }
 
-void teamDisplay() {
-    char *teamMembers[] = {
-            "\nKim Nhat Anh         s3978831",
-            "\nTran Quang Minh      s3988876",
-            "\nHuynh Ngoc Tai       s3978680",
-            "\nVu Thien Minh Hao    s3938011" // add name
-    };
+// void teamDisplay() {
+//     char *teamMembers[] = {
+//             "\nKim Nhat Anh         s3978831",
+//             "\nTran Quang Minh      s3988876",
+//             "\nHuynh Ngoc Tai       s3978680",
+//             "\nVu Thien Minh Hao    s3938011" // add name
+//     };
 
-    drawBackground(0x00101010);
-    int y = 20;
-    unsigned int colors[] = {0x00FF0000, 0x0000FF00, 0x000000FF, 0x00FFFF00}; // red, green, blue, yellow
-    for (int i = 0; i < 4; i++) {
-        drawString(30, y, teamMembers[i], colors[i % 4], 2);
-        y += 20;
-    }
+//     drawBackground(0x00101010);
+//     int y = 20;
+//     unsigned int colors[] = {0x00FF0000, 0x0000FF00, 0x000000FF, 0x00FFFF00}; // red, green, blue, yellow
+//     for (int i = 0; i < 4; i++) {
+//         drawString(30, y, teamMembers[i], colors[i % 4], 2);
+//         y += 20;
+//     }
+// }
+
+void teamDisplay() {
+    drawBackground(0x00101010); // dark background
+
+    drawString(30, 20,  "\nKim Nhat Anh         s3978831", 0x00FF0000, 2); // red
+    drawString(30, 40,  "\nTran Quang Minh      s3988876", 0x0000FF00, 2); // green
+    drawString(30, 60,  "\nHuynh Ngoc Tai       s3978680", 0x000000FF, 2); // blue
+    drawString(30, 80,  "\nVu Thien Minh Hao    s3938011", 0x00FFFF00, 2); // yellow
+    uart_puts("\n");
 }
 
 void videoDisplay(char *arg) {
@@ -330,4 +340,5 @@ void videoDisplay(char *arg) {
         drawImg(VIDEO_ARRAY[i], 0, 0, 1024, 768);
         delay_ms(50);  // 1000 ms / 31 frames ≈ 32 ms per frame
     }
+    uart_puts("\n");
 }

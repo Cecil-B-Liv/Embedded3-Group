@@ -17,29 +17,34 @@ void uart_init() {
 
     /* NEW: set up UART clock for consistent divisor values
     --> may not work with QEMU, but will work with real board */
-    mBuf[0] = 9 * 4;
-    mBuf[1] = MBOX_REQUEST;
-    mBuf[2] = MBOX_TAG_SETCLKRATE; // set clock rate
-    mBuf[3] = 12; // Value buffer size in bytes
-    mBuf[4] = 0; // REQUEST CODE = 0
-    mBuf[5] = 2; // clock id: UART clock
-    mBuf[6] = 4000000;     // rate: 4Mhz
-    mBuf[7] = 0;           // clear turbo
-    mBuf[8] = MBOX_TAG_LAST;
-    mbox_call(ADDR(mBuf), MBOX_CH_PROP);
+    // mBuf[0] = 9 * 4;
+    // mBuf[1] = MBOX_REQUEST;
+    // mBuf[2] = MBOX_TAG_SETCLKRATE; // set clock rate
+    // mBuf[3] = 12; // Value buffer size in bytes
+    // mBuf[4] = 0; // REQUEST CODE = 0
+    // mBuf[5] = 2; // clock id: UART clock
+    // mBuf[6] = 4000000;     // rate: 4Mhz
+    // mBuf[7] = 0;           // clear turbo
+    // mBuf[8] = MBOX_TAG_LAST;
+    // mbox_call(ADDR(mBuf), MBOX_CH_PROP);
 
     /* Setup GPIO pins 14 and 15 */
 
-    if (currentMode) {
+    // if (currentMode) {
     
-    } else {
-        /* Set GPIO14 and GPIO15 to be pl011 TX/RX which is ALT0	*/
-        r = GPFSEL1;
-        r &= ~((7 << 12) | (7 << 15)); //clear bits 17-12 (FSEL15, FSEL14)
-        r |= (0b100 << 12) | (0b100 << 15);   //Set value 0b100 (select ALT0: TXD0/RXD0)
-        GPFSEL1 = r;
-    }
+    // } else {
+    //     /* Set GPIO14 and GPIO15 to be pl011 TX/RX which is ALT0	*/
+    //     r = GPFSEL1;
+    //     r &= ~((7 << 12) | (7 << 15)); //clear bits 17-12 (FSEL15, FSEL14)
+    //     r |= (0b100 << 12) | (0b100 << 15);   //Set value 0b100 (select ALT0: TXD0/RXD0)
+    //     GPFSEL1 = r;
+    // }
 
+    /* Set GPIO14 and GPIO15 to be pl011 TX/RX which is ALT0	*/
+    r = GPFSEL1;
+    r &= ~((7 << 12) | (7 << 15)); //clear bits 17-12 (FSEL15, FSEL14)
+    r |= (0b100 << 12) | (0b100 << 15);   //Set value 0b100 (select ALT0: TXD0/RXD0)
+    GPFSEL1 = r;
 
     /* enable GPIO 14, 15 */
 #ifdef RPI3 //RBP3
@@ -69,13 +74,13 @@ void uart_init() {
     Fraction part register UART0_FBRD = (Fractional part * 64) + 0.5 */
 
     //115200 baud
-    // UART0_IBRD = 26;
-    // UART0_FBRD = 3;
+    UART0_IBRD = 26;
+    UART0_FBRD = 3;
 
     //NEW: with UART_CLOCK = 4MHz as set by mailbox:
     //115200 baud
-    UART0_IBRD = 2;
-    UART0_FBRD = 11;
+    // UART0_IBRD = 2;
+    // UART0_FBRD = 11;
 
 
     /* Set up the Line Control Register */

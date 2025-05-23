@@ -6,6 +6,7 @@
 void main() {
     // set up serial console
     uart_init();
+    uart_puts("UART working on real RPi3!\n");
 
     // setup the framebuffer
     framebf_init();
