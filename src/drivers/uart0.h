@@ -1,9 +1,4 @@
-//
-// Created by Nick Anderson on 23/5/25.
-//
-
-#ifndef EMBEDDED3_GROUP_UART0_H
-#define EMBEDDED3_GROUP_UART0_H
+#if 0
 
 #include "../kernel/gpio.h"
 

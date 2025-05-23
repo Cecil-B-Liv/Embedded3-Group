@@ -12,7 +12,7 @@ static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0; // pointer of command buffer
 
 // Tab function varriable
-static char *commands[] = {"help", "clear", "showinfo", "braudRate", "handShake", "teamDisplay", "videoDisplay"};
+static char *commands[] = {"help", "clear", "showinfo", "baudRate", "handShake", "teamDisplay", "videoDisplay"};
 static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
 static char *matched = 0; // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found

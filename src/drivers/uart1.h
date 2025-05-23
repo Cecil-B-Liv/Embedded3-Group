@@ -1,3 +1,5 @@
+#if 1
+
 #include "../kernel/gpio.h"
 
 /* Auxilary mini UART (UART1) registers */
@@ -30,3 +32,5 @@ void uart_dec(int num);
 void uart_set_baudrate(int baudrate);
 
 unsigned int uart_get_baudrate();
+
+#endif 

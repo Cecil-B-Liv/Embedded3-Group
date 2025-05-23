@@ -1,4 +1,7 @@
+#if 1
+
 #include "uart1.h"
+#include "mbox.h"
 
 /**
  * Set baud rate and characteristics (115200 8N1) and map to GPIO
@@ -151,3 +154,6 @@ unsigned int uart_get_baudrate() {
     unsigned int baudrate = (float) CLOCK_RATE / (8 * (baud_AUX + 1));
     return baudrate;
 }
+
+
+#endif

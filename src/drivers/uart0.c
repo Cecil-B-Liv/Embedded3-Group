@@ -1,9 +1,7 @@
-//
-// Created by Nick Anderson on 23/5/25.
-//
-
 #include "uart0.h"
-#include "../kernel/mbox.h"
+#include "mbox.h"
+
+#if 0
 
 /**
  * Set baud rate and characteristics (115200 8N1) and map to GPIO
@@ -176,3 +174,5 @@ void uart_dec(int num) {
 
     uart_puts(str);
 }
+
+#endif

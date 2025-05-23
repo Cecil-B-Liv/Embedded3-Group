@@ -1,6 +1,7 @@
 {
-    "files.associations": {
-        "fontsap.h": "c",
-        "framebf.h": "c"
-    }
+  "files.associations": {
+    "fontsap.h": "c",
+    "framebf.h": "c",
+    "uart0.h": "c"
+  }
 }
