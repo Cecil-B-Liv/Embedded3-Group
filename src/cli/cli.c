@@ -1,4 +1,4 @@
-#include "../drivers/uart1.h"
+#include "../drivers/uart0.h"
 #include "cli.h"
 #include "commands.h"
 #include "../util/stringUtil.h"

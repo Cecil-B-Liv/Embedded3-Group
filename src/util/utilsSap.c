@@ -2,6 +2,7 @@
 #include "fontSap.h"
 #include "../drivers/framebf.h"
 #include "../drivers/uart1.h"
+#include "../drivers/uart0.h"
 #include "utilsSap.h"
 
 /* Functions to display text on the screen */
@@ -43,7 +44,7 @@ void drawString(int x, int y, char *str, unsigned int attr, int zoom) {
 
 /* New function for Uart: Check and return if no new character, don't wait */
 
-#if 0 //UART0
+#if 1 //UART0
 unsigned int uart_isReadByteReady(){
     return ( !(UART0_FR & UART0_FR_RXFE) );
 }

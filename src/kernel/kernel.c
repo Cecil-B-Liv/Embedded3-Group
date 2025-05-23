@@ -1,4 +1,4 @@
-#include "../drivers/uart1.h"
+#include "../drivers/uart0.h"
 #include "../drivers/mbox.h"
 #include "../drivers/framebf.h"
 #include "../cli/cli.h"

@@ -1,7 +1,6 @@
-#if 0
+#if 1
 
 #include "../kernel/gpio.h"
-
 /* PL011 UART (UART0) registers */
 #define UART0_BASE    (MMIO_BASE + 0x201000)
 
@@ -150,6 +149,11 @@
 /* TDR = Test Data Register */
 #define UART0_TDR    (* (volatile unsigned int*)(UART0_BASE + 0x8C))
 
+// Declare enum for uart mode
+typedef enum {
+    UART0_MODE_NORMAL,
+    UART0_MODE_HANDSHAKE
+} uart_mode_t;
 
 /* Function prototypes */
 void uart_init();

@@ -1,7 +1,9 @@
+#if 1
+
 #include "uart0.h"
 #include "mbox.h"
 
-#if 0
+uart_mode_t currentMode = UART0_MODE_NORMAL;
 
 /**
  * Set baud rate and characteristics (115200 8N1) and map to GPIO
@@ -28,11 +30,16 @@ void uart_init() {
 
     /* Setup GPIO pins 14 and 15 */
 
-    /* Set GPIO14 and GPIO15 to be pl011 TX/RX which is ALT0	*/
-    r = GPFSEL1;
-    r &= ~((7 << 12) | (7 << 15)); //clear bits 17-12 (FSEL15, FSEL14)
-    r |= (0b100 << 12) | (0b100 << 15);   //Set value 0b100 (select ALT0: TXD0/RXD0)
-    GPFSEL1 = r;
+    if (currentMode) {
+    
+    } else {
+        /* Set GPIO14 and GPIO15 to be pl011 TX/RX which is ALT0	*/
+        r = GPFSEL1;
+        r &= ~((7 << 12) | (7 << 15)); //clear bits 17-12 (FSEL15, FSEL14)
+        r |= (0b100 << 12) | (0b100 << 15);   //Set value 0b100 (select ALT0: TXD0/RXD0)
+        GPFSEL1 = r;
+    }
+
 
     /* enable GPIO 14, 15 */
 #ifdef RPI3 //RBP3

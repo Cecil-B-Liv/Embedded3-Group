@@ -1,6 +1,6 @@
 // ----------------------------------- framebf.c -------------------------------------
 #include "mbox.h"
-#include "uart1.h"
+#include "uart0.h"
 #include "framebf.h"
 
 //Use RGBA32 (32 bits for each pixel)
@@ -17,7 +17,6 @@ unsigned int width, height, pitch;
 /* Frame buffer address
  * (declare as pointer of unsigned char to access each byte) */
 unsigned char *fb;
-
 
 /**
  * Set screen resolution to 1024x768

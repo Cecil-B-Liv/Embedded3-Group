@@ -4,7 +4,7 @@
 #include "../util/time.h"
 #include "../util/utilsSap.h"
 
-#include "../drivers/uart1.h"
+#include "../drivers/uart0.h"
 #include "../drivers/mbox.h"
 #include "../drivers/framebf.h"
 
@@ -18,7 +18,7 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
         {"clear",        "                 Clear screen",                                                                                                                                    clear},
         {"showinfo",     "                 Show board revision and board MAC address",                                                                                                       showInfo},
         {"baudRate",     "                 Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
-        {"handShake",    "                 Allow the user to turn on/off CTS/RTS handshaking",                                                                                               handShake},
+        // {"handShake",    "                 Allow the user to turn on/off CTS/RTS handshaking",                                                                                               handShake},
         {"teamDisplay",  "                 Display all team members name on the screen",                                                                                                     teamDisplay},
         {"videoDisplay", "                 Display the video",                                                                                                                               videoDisplay}
 };
@@ -154,8 +154,6 @@ void baudRate(char *arg) {
         case 38400:
         case 57600:
         case 115200:
-            uart_puts("\nWas using: ");
-            uart_dec(uart_get_baudrate());
             uart_puts("\nBaud rate set successfully.\n");
             uart_puts("Now using ");
             uart_dec(baud);
@@ -192,35 +190,35 @@ void baudRate(char *arg) {
     // uart_puts("\n");
 }
 
-void handShakeSend(char *arg) {
-    // This command accept no argument
-    if (arg != 0) {
-        error(arg);
-        return;
-    }
+// void handShakeSend(char *arg) {
+//     // This command accept no argument
+//     if (arg != 0) {
+//         error(arg);
+//         return;
+//     }
 
-    uart_puts("HELLO\n");  // Send greeting
-    uart_puts("[WAITING FOR RETERN]\n");
+//     uart_puts("HELLO\n");  // Send greeting
+//     uart_puts("[WAITING FOR RETERN]\n");
 
-    char buf[8] = {0};
-    int i = 0;
+//     char buf[8] = {0};
+//     int i = 0;
 
-    while (1) {
-        char c = uart_getc();  // Blocking read
-        if (c == '\n') {
-            buf[i] = '\0';
-            if (strComp(buf, "RETURN")) {
-                uart_puts("[RETURN RECEIVED] Starting...\n");
-                break;
-            } else {
-                uart_puts("[INVALID RESPONSE] Retrying...\n");
-                i = 0;
-            }
-        } else if (i < 7) {
-            buf[i++] = c;
-        }
-    }
-}
+//     while (1) {
+//         char c = uart_getc();  // Blocking read
+//         if (c == '\n') {
+//             buf[i] = '\0';
+//             if (strComp(buf, "RETURN")) {
+//                 uart_puts("[RETURN RECEIVED] Starting...\n");
+//                 break;
+//             } else {
+//                 uart_puts("[INVALID RESPONSE] Retrying...\n");
+//                 i = 0;
+//             }
+//         } else if (i < 7) {
+//             buf[i++] = c;
+//         }
+//     }
+// }
 
 void error(char *error) {
     uart_puts("\n[ERROR] ");
