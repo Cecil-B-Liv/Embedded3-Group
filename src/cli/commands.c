@@ -271,26 +271,8 @@ char *getBoardModel(int rev) {
     }
 }
 
-// void teamDisplay() {
-//     char *teamMembers[] = {
-//             "\nKim Nhat Anh         s3978831",
-//             "\nTran Quang Minh      s3988876",
-//             "\nHuynh Ngoc Tai       s3978680",
-//             "\nVu Thien Minh Hao    s3938011" // add name
-//     };
-
-//     drawBackground(0x00101010);
-//     int y = 20;
-//     unsigned int colors[] = {0x00FF0000, 0x0000FF00, 0x000000FF, 0x00FFFF00}; // red, green,
-//     blue, yellow for (int i = 0; i < 4; i++) {
-//         drawString(30, y, teamMembers[i], colors[i % 4], 2);
-//         y += 20;
-//     }
-// }
-
 void teamDisplay() {
-    drawBackground(0x00101010);  // dark background
-    // drawImg(VIDEO_ARRAY[0], 0, 0, 1024, 768);
+    drawImg(background, 0, 0, 1024, 768);
 
     drawString(30, 240, "\nKIM NHAT ANH         s3978831", 0x00FF0000, 3);   // red
     drawString(30, 290, "\nTRAN QUANG MINH      s3988876", 0x0000FF00, 3);   // green
@@ -304,6 +286,8 @@ void videoDisplay(char *arg) {
         error(arg);
         return;
     }
+
+    drawImg(background, 0, 0, 1024, 768);
 
     for (int i = 0; i <= 30; i++) {
         drawImg(VIDEO_ARRAY[i], 200, 215, 600, 338);

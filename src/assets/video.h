@@ -29,6 +29,7 @@
 #include "./videoFrames/vf_029.h"
 #include "./videoFrames/vf_030.h"
 #include "./videoFrames/vf_031.h"
+#include "background.h"
 
 const unsigned int* VIDEO_ARRAY[31] = {
     VF_001,
