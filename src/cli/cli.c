@@ -18,7 +18,6 @@ static char *matched = 0;    // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found
 
 // History varriable
-static int recallingFromHistory = 0;
 static char history[MAX_HISTORY][MAX_COMMAND_SIZE];
 static int historyCount = 0;
 static int historyIndex = -1;
@@ -59,6 +58,45 @@ void cli_process()
     switch (c)
     {
 
+    case 0x1B:
+    { // ESC
+        char next = uart_getc();
+        if (next == '[')
+        {
+            char dir = uart_getc();
+            if (dir == 'A')
+            { // Up
+                if (historyIndex > 0)
+                {
+                    historyIndex--;
+                    clearDisplay();
+                    clearBuff(1);
+                    strCopy(commandBuffer, history[historyIndex]);
+                    cbIndex = strLen(commandBuffer);
+                    uart_puts(commandBuffer);
+                }
+            }
+            else if (dir == 'B')
+            { // Down
+                if (historyIndex < historyCount - 1)
+                {
+                    historyIndex++;
+                    clearDisplay();
+                    clearBuff(1);
+                    strCopy(commandBuffer, history[historyIndex]);
+                    cbIndex = strLen(commandBuffer);
+                    uart_puts(commandBuffer);
+                }
+                else
+                {
+                    clearDisplay();
+                    clearBuff(1);
+                }
+            }
+        }
+        break;
+    }
+
     // User using autofill by pressing tab
     case '\t':
         // Loop to check the matched command
@@ -98,22 +136,18 @@ void cli_process()
         // Call the commands processer function
         cmdProcess(commandBuffer);
 
-        if (cbIndex > 0)
-        {
-            if (historyCount < MAX_HISTORY)
-            {
-                strCopy(history[historyCount++], commandBuffer);
-            }
-            else
-            {
-                for (int i = 1; i < MAX_HISTORY; i++)
-                {
-                    strCopy(history[i - 1], history[i]);
-                }
-                strCopy(history[MAX_HISTORY - 1], commandBuffer);
-            }
-        }
-        historyIndex = historyCount;
+        // Save to history
+        // if (historyCount < MAX_HISTORY) {
+        //         copyString(history[historyCount], commandBuffer);
+        //         historyCount++;
+        //     } else {
+        //         // Shift up and insert at end
+        //         for (int i = 1; i < MAX_HISTORY; i++) {
+        //             copyString(history[i - 1], history[i]);
+        //         }
+        //         copyString(history[MAX_HISTORY - 1], commandBuffer);
+        //     }
+        //     historyIndex = historyCount;
 
         // Clear buffer after process the command
         clearBuff(0);
@@ -151,62 +185,6 @@ void cli_process()
         cbIndex++;
         // Print the user input to the terminal
         uart_sendc(c);
-
-        if (c == 0x1B)
-        { // ESC
-            char next = uart_getc();
-            if (next == '[')
-            {
-                char dir = uart_getc();
-                if (dir == 'A')
-                { // Up arrow
-                    if (historyIndex > 0)
-                    {
-                        historyIndex--;
-                        clearDisplay();
-                        clearBuff(1);
-                        strCopy(commandBuffer, history[historyIndex]);
-                        cbIndex = strLen(commandBuffer);
-                        uart_puts(commandBuffer);
-                        recallingFromHistory = 1;
-                    }
-                    return;
-                }
-                else if (dir == 'B')
-                { // Down arrow
-                    if (historyIndex < historyCount - 1)
-                    {
-                        historyIndex++;
-                        clearDisplay();
-                        clearBuff(1);
-                        strCopy(commandBuffer, history[historyIndex]);
-                        cbIndex = strLen(commandBuffer);
-                        uart_puts(commandBuffer);
-                    }
-                    else
-                    {
-                        clearDisplay();
-                        clearBuff(1);
-                    }
-                    return;
-                }
-            }
-        }
-
-        if (recallingFromHistory)
-        {
-            clearDisplay();
-            clearBuff(1);
-            recallingFromHistory = 0;
-        }
-
-        if (cbIndex < MAX_COMMAND_SIZE - 1)
-        {
-            commandBuffer[cbIndex++] = c;
-            commandBuffer[cbIndex] = '\0';
-            uart_sendc(c);
-        }
-        break;
     }
 }
 
