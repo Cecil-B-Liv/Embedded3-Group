@@ -169,10 +169,6 @@ void cli_process()
         // Normal input
     default:
         // Maximum command size reached
-        uart_puts("\n[DEBUG] Got: ");
-        uart_hex((unsigned int)c);
-        uart_puts("\n");
-
         if (cbIndex > MAX_COMMAND_SIZE - 1)
         {
             break; // do nothing
@@ -181,7 +177,7 @@ void cli_process()
         commandBuffer[cbIndex] = c;
         cbIndex++;
         // Print the user input to the terminal
-        // uart_sendc(c);
+        uart_sendc(c);
     }
 }
 
