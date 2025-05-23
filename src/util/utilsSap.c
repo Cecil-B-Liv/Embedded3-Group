@@ -1,5 +1,5 @@
-#include "./testFont/Minecraft_font_fix.h"
-//#include "fontSap.h"
+//#include "Minecraft_font_generated.h"
+#include "testFont/Minecraft_font_generated2.h"
 #include "../drivers/framebf.h"
 #include "../drivers/uart0.h"
 #include "utilsSap.h"
