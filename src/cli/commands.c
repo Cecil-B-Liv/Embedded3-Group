@@ -322,11 +322,13 @@ char *getBoardModel(int rev) {
 
 void teamDisplay() {
     drawBackground(0x00101010); // dark background
+    drawImg(VIDEO_ARRAY[0], 0, 0, 1024, 768);
 
-    drawString(30, 20,  "\nKim Nhat Anh         s3978831", 0x00FF0000, 2); // red
-    drawString(30, 40,  "\nTran Quang Minh      s3988876", 0x0000FF00, 2); // green
-    drawString(30, 60,  "\nHuynh Ngoc Tai       s3978680", 0x000000FF, 2); // blue
-    drawString(30, 80,  "\nVu Thien Minh Hao    s3938011", 0x00FFFF00, 2); // yellow
+
+    drawString(30, 20, "\nKIM NHAT ANH         s3978831", 0x00FF0000, 3); // red
+    drawString(30, 60, "\nTRAN QUANG MINH      s3988876", 0x0000FF00, 3); // green
+    drawString(30, 100, "\nHUYNH NGOC TAI       s3978680", 0x000000FF, 3); // blue
+    drawString(30, 140, "\nVU THIEN MINH HAO    s3938011", 0x00FFFF00, 3); // yellow
     uart_puts("\n");
 }
 

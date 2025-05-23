@@ -1,28 +1,29 @@
 import re
 
 
-def reverse_bits(byte):
-    return int(f"{byte:08b}"[::-1], 2)
+def reverse_bits_10(value):
+    bits_10 = value & 0x03FF  # Only use bottom 10 bits
+    return int(f"{bits_10:010b}"[::-1], 2)
 
-
-# Read the file content
-input_path = "/Users/milkyway/Documents/GitHub/Embedded3-Group/src/util/testFont/Minecraft_font_up_side.h"
+# Paths
+input_path = "/Users/milkyway/Documents/GitHub/Embedded3-Group/src/util/testFont/Minecraft_font_generated2.h"
 output_path = "/Users/milkyway/Documents/GitHub/Embedded3-Group/src/util/testFont/Minecraft_font_fix2.h"
 
+# Read file
 with open(input_path, "r") as f:
     content = f.read()
 
-# Find all byte values in hex format
-byte_pattern = re.compile(r"0x([0-9A-Fa-f]{2})")
-matches = byte_pattern.findall(content)
+# Match 16-bit hex values (e.g., 0xABCD)
+hex_pattern = re.compile(r"0x([0-9A-Fa-f]{4})")
+matches = hex_pattern.findall(content)
 
-# Invert bits for each hex value
-inverted_bytes = [f"0x{reverse_bits(int(b, 16)):02X}" for b in matches]
+# Reverse only 10-bit portion
+inverted_words = [f"0x{reverse_bits_10(int(h, 16)):04X}" for h in matches]
 
-# Replace the original values with inverted ones
-new_content = byte_pattern.sub(lambda m: inverted_bytes.pop(0), content)
+# Replace content
+new_content = hex_pattern.sub(lambda m: inverted_words.pop(0), content)
 
-# Write to a new file
+# Save result
 with open(output_path, "w") as f:
     f.write(new_content)
 

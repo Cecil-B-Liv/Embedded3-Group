@@ -1,5 +1,5 @@
 //#include "Minecraft_font_generated.h"
-#include "testFont/Minecraft_font_generated2.h"
+#include "testFont/Minecraft_font_256_corrected_reversed_inner.h"
 #include "../drivers/framebf.h"
 #include "../drivers/uart0.h"
 #include "utilsSap.h"
@@ -19,7 +19,6 @@ void drawChar(unsigned char ch, int x, int y, unsigned int attr, int zoom) {
         glyph += (i % zoom) ? 0 : FONT_BPL;
     }
 }
-
 
 void drawString(int x, int y, char *str, unsigned int attr, int zoom) {
     while (*str) {
