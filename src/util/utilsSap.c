@@ -1,5 +1,5 @@
-//#include "Minecraft_font_generated.h"
-#include "fontSap.h"
+#include "./testFont/Minecraft_font_fix.h"
+//#include "fontSap.h"
 #include "../drivers/framebf.h"
 #include "../drivers/uart0.h"
 #include "utilsSap.h"
@@ -44,8 +44,9 @@ void drawString(int x, int y, char *str, unsigned int attr, int zoom) {
 /* New function for Uart: Check and return if no new character, don't wait */
 
 #if 1 //UART0
-unsigned int uart_isReadByteReady(){
-    return ( !(UART0_FR & UART0_FR_RXFE) );
+
+unsigned int uart_isReadByteReady() {
+    return (!(UART0_FR & UART0_FR_RXFE));
 }
 
 #else //UART1

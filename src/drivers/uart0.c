@@ -50,9 +50,11 @@ void uart_init() {
 #ifdef RPI3 //RBP3
     GPPUD = 0;            //No pull up/down control
     //Toogle clock to flush GPIO setup
-    r = 150; while (r--) { asm volatile("nop"); } //waiting 150 cycles
+    r = 150;
+    while (r--) { asm volatile("nop"); } //waiting 150 cycles
     GPPUDCLK0 = (1 << 14) | (1 << 15); //enable clock for GPIO 14, 15
-    r = 150; while (r--) { asm volatile("nop"); } //waiting 150 cycles
+    r = 150;
+    while (r--) { asm volatile("nop"); } //waiting 150 cycles
     GPPUDCLK0 = 0;        // flush GPIO setup
 
 #else //RPI4
