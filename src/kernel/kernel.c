@@ -3,9 +3,10 @@
 #include "../drivers/framebf.h"
 #include "../cli/cli.h"
 
-void main() {
+void main()
+{
     // set up serial console
-    uart_init();
+    uart_init(UART0_MODE_NORMAL, 115200);
     uart_puts("UART working on real RPi3!\n");
 
     // setup the framebuffer
@@ -15,7 +16,8 @@ void main() {
     cli_welcome();
 
     // CLI processing
-    while (1) {
+    while (1)
+    {
         cli_process();
     }
 }
