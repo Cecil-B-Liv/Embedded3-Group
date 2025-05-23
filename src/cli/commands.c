@@ -19,6 +19,7 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
         {"showinfo",     "                 Show board revision and board MAC address",                                                                                                       showInfo},
         {"baudRate",     "                 Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
         // {"handShake",    "                 Allow the user to turn on/off CTS/RTS handshaking",                                                                                               handShake},
+
         {"teamDisplay",  "                 Display all team members name on the screen",                                                                                                     teamDisplay},
         {"videoDisplay", "                 Display the video",                                                                                                                               videoDisplay}
 };
@@ -327,6 +328,6 @@ void videoDisplay(char *arg) {
 
     for (int i = 0; i <= 30; i++) {
         drawImg(VIDEO_ARRAY[i], 0, 0, 1024, 768);
-        delay_ms(32);  // 1000 ms / 31 frames ≈ 32 ms per frame
+        delay_ms(50);  // 1000 ms / 31 frames ≈ 32 ms per frame
     }
 }
