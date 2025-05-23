@@ -58,44 +58,35 @@ void cli_process()
     switch (c)
     {
 
-    case 0x1B:
-    { // ESC
-        char next = uart_getc();
-        if (next == '[')
+    case '-': // Go backward in history
+        if (historyIndex > 0)
         {
-            char dir = uart_getc();
-            if (dir == 'A')
-            { // Up
-                if (historyIndex > 0)
-                {
-                    historyIndex--;
-                    clearDisplay();
-                    clearBuff(1);
-                    strCopy(commandBuffer, history[historyIndex]);
-                    cbIndex = strLen(commandBuffer);
-                    uart_puts(commandBuffer);
-                }
-            }
-            else if (dir == 'B')
-            { // Down
-                if (historyIndex < historyCount - 1)
-                {
-                    historyIndex++;
-                    clearDisplay();
-                    clearBuff(1);
-                    strCopy(commandBuffer, history[historyIndex]);
-                    cbIndex = strLen(commandBuffer);
-                    uart_puts(commandBuffer);
-                }
-                else
-                {
-                    clearDisplay();
-                    clearBuff(1);
-                }
-            }
+            historyIndex--;
+            clearDisplay();
+            clearBuff(1);
+            strCopy(commandBuffer, history[historyIndex]);
+            cbIndex = strLen(commandBuffer);
+            uart_puts(commandBuffer);
         }
         break;
-    }
+
+    case '+': // Go forward in history
+        if (historyIndex < historyCount - 1)
+        {
+            historyIndex++;
+            clearDisplay();
+            clearBuff(1);
+            strCopy(commandBuffer, history[historyIndex]);
+            cbIndex = strLen(commandBuffer);
+            uart_puts(commandBuffer);
+        }
+        else
+        {
+            // Clear input if at the end
+            clearDisplay();
+            clearBuff(1);
+        }
+        break;
 
     // User using autofill by pressing tab
     case '\t':
@@ -136,20 +127,22 @@ void cli_process()
         // Call the commands processer function
         cmdProcess(commandBuffer);
 
-        // Save to history
-        // if (historyCount < MAX_HISTORY) {
-        //         copyString(history[historyCount], commandBuffer);
-        //         historyCount++;
-        //     } else {
-        //         // Shift up and insert at end
-        //         for (int i = 1; i < MAX_HISTORY; i++) {
-        //             copyString(history[i - 1], history[i]);
-        //         }
-        //         copyString(history[MAX_HISTORY - 1], commandBuffer);
-        //     }
-        //     historyIndex = historyCount;
-
-        // Clear buffer after process the command
+        if (cbIndex > 0)
+        {
+            if (historyCount < MAX_HISTORY)
+            {
+                strCopy(history[historyCount++], commandBuffer);
+            }
+            else
+            {
+                for (int i = 1; i < MAX_HISTORY; i++)
+                {
+                    strCopy(history[i - 1], history[i]);
+                }
+                strCopy(history[MAX_HISTORY - 1], commandBuffer);
+            }
+        }
+        historyIndex = historyCount;
         clearBuff(0);
 
         break;
