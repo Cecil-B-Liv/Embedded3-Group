@@ -33,3 +33,5 @@
 
 ./src/build/
 *.xml
+src/kernel8.img
+src/build/kernel8.elf

@@ -1,7 +1,6 @@
 //#include "Minecraft_font_generated.h"
 #include "fontSap.h"
 #include "../drivers/framebf.h"
-#include "../drivers/uart1.h"
 #include "../drivers/uart0.h"
 #include "utilsSap.h"
 
