@@ -14,7 +14,7 @@ void clear(char *arg);
 
 void baudRate(char *arg);
 
-void handShake(char *arg);
+void handShakeSend(char *arg);
 
 void showInfo(char *arg);
 
