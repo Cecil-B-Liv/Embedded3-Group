@@ -18,6 +18,7 @@ static char *matched = 0;    // place holder for the matched checking
 static int matchedFound = 0; // Flag to check if matched found
 
 // History varriable
+static int recallingFromHistory = 0;
 static char history[MAX_HISTORY][MAX_COMMAND_SIZE];
 static int historyCount = 0;
 static int historyIndex = -1;
@@ -167,6 +168,7 @@ void cli_process()
                         strCopy(commandBuffer, history[historyIndex]);
                         cbIndex = strLen(commandBuffer);
                         uart_puts(commandBuffer);
+                        recallingFromHistory = 1;
                     }
                     return;
                 }
@@ -189,6 +191,13 @@ void cli_process()
                     return;
                 }
             }
+        }
+
+        if (recallingFromHistory)
+        {
+            clearDisplay();
+            clearBuff(1);
+            recallingFromHistory = 0;
         }
 
         if (cbIndex < MAX_COMMAND_SIZE - 1)
