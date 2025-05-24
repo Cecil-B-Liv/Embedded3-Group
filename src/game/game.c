@@ -3,6 +3,8 @@
 #include "../drivers/framebf.h"
 #include "../assets/gameAssets.h"
 
+// static gameStage = 1;
+
 void gameMenu(){
     drawImg(title_start, 0, 0, 1024, 768);
     int isStart = 1;
@@ -27,6 +29,7 @@ void gameMenu(){
         case '\n':
             if (isStart){
                 uart_puts("\nGame enter");
+                gameLoop();
             } else {
                 uart_puts("\nGame exist");
                 clearScreen();
@@ -38,4 +41,15 @@ void gameMenu(){
         }
     }
     
+}
+
+void gameLoop(){
+    drawImg(stage1, 0, 0, 1024, 768);
+    drawImg(basketball_web, 700, 600, 32, 24);
+    while (1){
+        char c = uart_getc();
+        if (c == '\n'){
+            return;
+        }
+    }
 }
