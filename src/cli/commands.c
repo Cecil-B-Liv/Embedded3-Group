@@ -15,13 +15,13 @@
 static int currentbaudrate = 115200;
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
-    {"help", "                          Show brief information of all commands", help},
-    {"clear", "                         Clear screen", clear},
-    {"showinfo", "                      Show board revision and board MAC address", showInfo},
-    {"baudRate","                      Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
-    {"handShake", "                     Allow the user to turn on/off CTS/RTS handshaking", handShake},
-    {"teamDisplay", "                   Display all team members name on the screen", teamDisplay},
-    {"videoDisplay", "                  Display the video", videoDisplay}};
+        {"help",         "                          Show brief information of all commands",                                                                                                      help},
+        {"clear",        "                         Clear screen",                                                                                                                                 clear},
+        {"showinfo",     "                      Show board revision and board MAC address",                                                                                                       showInfo},
+        {"baudRate",     "                      Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
+        {"handShake",    "                     Allow the user to turn on/off CTS/RTS handshaking",                                                                                                handShake},
+        {"teamDisplay",  "                   Display all team members name on the screen",                                                                                                        teamDisplay},
+        {"videoDisplay", "                  Display the video",                                                                                                                                   videoDisplay}};
 
 void cmdProcess(char *cmdBuff) {
     // Split the original buffer too two, cmd and argument
@@ -185,10 +185,10 @@ void showInfo(char *arg) {
     mBuf[7] = MBOX_TAG_LAST;
 
     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
-        unsigned char *mac = (unsigned char *)&mBuf[5];
+        unsigned char *mac = (unsigned char *) &mBuf[5];
         uart_puts("\nMAC Address: ");
         for (int i = 0; i < 6; i++) {
-            uart_mac_formater(mac[i]);
+            uart_mac_formatter(mac[i]);
             if (i < 5) uart_puts(":");
         }
         uart_puts("\n");
@@ -233,7 +233,7 @@ void baudRate(char *arg) {
 
 void handShake(char *arg) {
     unsigned int handshakemode = 0;
-    if (!arg || arg[0] == '\0' ) {
+    if (!arg || arg[0] == '\0') {
         error(arg);
         return;
     }
@@ -270,25 +270,44 @@ char *getBoardModel(int rev) {
         int model = (rev >> 4) & 0xFF;
 
         switch (model) {
-            case 0x00: return "Model: A\nRAM: 256MB\nRevision: 1.0";
-            case 0x01: return "Model: B\nRAM: 256MB\nRevision: 1.0/1.1";
-            case 0x02: return "Model: A+\nRAM: 256MB or 512MB\nRevision: 1.1";
-            case 0x03: return "Model: B+\nRAM: 512MB\nRevision: 1.2";
-            case 0x04: return "Model: 2B\nRAM: 1GB\nRevision: 1.0";
-            case 0x06: return "Model: CM1\nRAM: 512MB\nRevision: 1.0";
-            case 0x08: return "Model: 3B\nRAM: 1GB\nRevision: 1.2";
-            case 0x09: return "Model: Zero\nRAM: 512MB\nRevision: 1.2";
-            case 0x0C: return "Model: Zero W\nRAM: 512MB\nRevision: 1.1";
-            case 0x0D: return "Model: 3B+\nRAM: 1GB\nRevision: 1.3";
-            case 0x0E: return "Model: 3A+\nRAM: 512MB\nRevision: 1.0";
-            case 0x10: return "Model: CM3+\nRAM: 1GB\nRevision: 1.0";
-            case 0x11: return "Model: 4B\nRAM: 1GB\nRevision: 1.1";
-            case 0x12: return "Model: 4B\nRAM: 2GB\nRevision: 1.2";
-            case 0x13: return "Model: 4B\nRAM: 4GB\nRevision: 1.2";
-            case 0x14: return "Model: 4B\nRAM: 8GB\nRevision: 1.4";
-            case 0x15: return "Model: 400\nRAM: 4GB\nRevision: 1.0";
-            case 0x19: return "Model: Zero 2 W\nRAM: 512MB or 1GB\nRevision: 1.0";
-            case 0x1A: return "Model: 3A+ (alternate)\nRAM: 512MB\nRevision: 1.1";
+            case 0x00:
+                return "Model: A\nRAM: 256MB\nRevision: 1.0";
+            case 0x01:
+                return "Model: B\nRAM: 256MB\nRevision: 1.0/1.1";
+            case 0x02:
+                return "Model: A+\nRAM: 256MB or 512MB\nRevision: 1.1";
+            case 0x03:
+                return "Model: B+\nRAM: 512MB\nRevision: 1.2";
+            case 0x04:
+                return "Model: 2B\nRAM: 1GB\nRevision: 1.0";
+            case 0x06:
+                return "Model: CM1\nRAM: 512MB\nRevision: 1.0";
+            case 0x08:
+                return "Model: 3B\nRAM: 1GB\nRevision: 1.2";
+            case 0x09:
+                return "Model: Zero\nRAM: 512MB\nRevision: 1.2";
+            case 0x0C:
+                return "Model: Zero W\nRAM: 512MB\nRevision: 1.1";
+            case 0x0D:
+                return "Model: 3B+\nRAM: 1GB\nRevision: 1.3";
+            case 0x0E:
+                return "Model: 3A+\nRAM: 512MB\nRevision: 1.0";
+            case 0x10:
+                return "Model: CM3+\nRAM: 1GB\nRevision: 1.0";
+            case 0x11:
+                return "Model: 4B\nRAM: 1GB\nRevision: 1.1";
+            case 0x12:
+                return "Model: 4B\nRAM: 2GB\nRevision: 1.2";
+            case 0x13:
+                return "Model: 4B\nRAM: 4GB\nRevision: 1.2";
+            case 0x14:
+                return "Model: 4B\nRAM: 8GB\nRevision: 1.4";
+            case 0x15:
+                return "Model: 400\nRAM: 4GB\nRevision: 1.0";
+            case 0x19:
+                return "Model: Zero 2 W\nRAM: 512MB or 1GB\nRevision: 1.0";
+            case 0x1A:
+                return "Model: 3A+ (alternate)\nRAM: 512MB\nRevision: 1.1";
             default:
                 return "Model: Unknown (new-style revision)";
         }
@@ -366,7 +385,6 @@ char *getBoardModel(int rev) {
             return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
     }
 }
-
 
 
 void teamDisplay() {

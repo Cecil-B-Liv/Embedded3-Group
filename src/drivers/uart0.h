@@ -150,11 +150,17 @@
 #define UART0_TDR (*(volatile unsigned int *)(UART0_BASE + 0x8C))
 
 // Declare enum for uart mode
-typedef enum
-{
+typedef enum {
     UART0_MODE_NORMAL,
     UART0_MODE_HANDSHAKE
 } uart_mode_t;
+
+enum {
+    KEY_ARROW_UP = 0x81,
+    KEY_ARROW_DOWN,
+    KEY_ARROW_RIGHT,
+    KEY_ARROW_LEFT
+};
 
 /* Function prototypes */
 void uart_init(uart_mode_t mode, int baudrate);
@@ -168,8 +174,13 @@ void uart_puts(char *s);
 void uart_hex(unsigned int num);
 
 void uart_dec(int num);
-int *caculate_IBRD(int baudrate);
+
+int *calculate_IBRD(int baudrate);
+
 void uart_setBaudrate(int baudrate);
-void uart_mac_formater(unsigned int num);
+
+void uart_mac_formatter(unsigned int num);
+
+char uart_get_escape_sequence();
 
 #endif // EMBEDDED3_GROUP_UART0_H
