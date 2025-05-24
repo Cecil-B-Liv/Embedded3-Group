@@ -6,3 +6,5 @@
 
 #include "./gameObjects/basketball_hoops.h"
 #include "./gameObjects/normal_ball.h"
+#include "./gameObjects/special_ball.h"
+#include "./gameObjects/bomb.h"

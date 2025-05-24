@@ -390,26 +390,26 @@ void teamDisplay()
 
 void videoDisplay(char *arg)
 {
-    if (arg != 0)
-    {
-        error(arg);
-        return;
-    }
+    // if (arg != 0)
+    // {
+    //     error(arg);
+    //     return;
+    // }
 
-    drawImg(background, 0, 0, 1024, 768);
+    // drawImg(background, 0, 0, 1024, 768);
 
-    for (int i = 0; i <= 24; i++)
-    {
-        drawImg(AK_part1_allArray[i], 200, 215, 700, 338);
-        wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-    }
+    // for (int i = 0; i <= 24; i++)
+    // {
+    //     drawImg(AK_part1_allArray[i], 200, 215, 700, 338);
+    //     wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+    // }
 
-    for (int i = 0; i <= 24; i++)
-    {
-        drawImg(AK_part2_allArray[i], 200, 215, 700, 338);
-        wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-    }
-    uart_puts("\n");
+    // for (int i = 0; i <= 24; i++)
+    // {
+    //     drawImg(AK_part2_allArray[i], 200, 215, 700, 338);
+    //     wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+    // }
+    // uart_puts("\n");
 }
 
 void game()

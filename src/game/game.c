@@ -32,9 +32,9 @@
 #define SPEICAL_BALL_TAG  3
 #define BOMB_TAG          4
 
-#define STAGE1_SCORE    30
-#define STAGE2_SCORE    30
-#define STAGE3_SCORE    30
+#define STAGE1_SCORE    60
+#define STAGE2_SCORE    60
+#define STAGE3_SCORE    60
 
 static GameObject player = {.type = PLAYER_TAG,
                             .x = PLAYER_START_X, 
@@ -48,7 +48,7 @@ static GameObject player = {.type = PLAYER_TAG,
 static int score = 0;
 static int win = 0;
 
-static int current_stage_index = 1;
+static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
 static const unsigned int *current_stage = stage1;
 
@@ -148,18 +148,42 @@ void gameLoop(){
     }
 }
 
+int getRandomBallType(int stage) {
+    int r = SYS_TIMER_CLO % 100;
+
+    // Stage 1
+    if (stage == 0) { 
+        if (r < 90) return NORMAL_BALL_TAG; // 90% rate
+        else if (r < 99) return SPEICAL_BALL_TAG; // 10% rate
+        else return NORMAL_BALL_TAG;  // <- fallback if r >= 99
+    // Stage 2
+    } else if (stage == 1) { 
+        if (r < 70) return NORMAL_BALL_TAG; // 70% rate
+        else if (r < 90) return SPEICAL_BALL_TAG; // 20% rate
+        else return BOMB_TAG; // 10% rate
+    // Stage 3
+    } else { 
+        if (r < 60) return NORMAL_BALL_TAG; //60% rate
+        else if (r < 80) return SPEICAL_BALL_TAG; // 20% rate
+        else return BOMB_TAG; // 20% rate
+    }
+
+    // return normal ball as default
+    return 0;
+}
+
 void checkStageProgression() {
-    if (score >= STAGE1_SCORE && current_stage_index == 1) {
-        current_stage_index = 2;
+    if (score >= STAGE1_SCORE && current_stage_index == 0) {
+        current_stage_index = 1;
         changeToStage(stages[1]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    } else if (score >= STAGE2_SCORE && current_stage_index == 2) {
-        current_stage_index = 3;
+    } else if (score >= STAGE2_SCORE && current_stage_index == 1) {
+        current_stage_index = 2;
         changeToStage(stages[2]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    } else if (score >= STAGE3_SCORE && current_stage_index == 3) {
+    } else if (score >= STAGE3_SCORE && current_stage_index == 2) {
         win = 1;
     }
 }
@@ -186,12 +210,12 @@ void checkCollision(){
             }
             // Special ball
             if (balls[i].type == SPEICAL_BALL_TAG){
-                score += NORMAL_SCORE;
+                score += SPECIAL_SCORE;
                 continue;
             }
             // Bomb
             if (balls[i].type == BOMB_TAG){
-                score += NORMAL_SCORE;
+                score += BOMB_SCORE;
                 continue;
             }
         }
@@ -204,15 +228,24 @@ void spawnBall() {
     for (int i = 0; i < MAX_BALLS; i++) {
         if (!balls[i].alive) {
             // Set up the ball
+
+            // Get the random object
+            int ball_type = getRandomBallType(current_stage_index);
+
+            // Get the sprite of the object
+            const unsigned int* sprite = normal_ball; // default value
+            if (ball_type == SPEICAL_BALL_TAG) sprite = special_ball;
+            else if (ball_type == BOMB_TAG) sprite = bomb;
+
             balls[i] = (GameObject){
-                .type = NORMAL_BALL_TAG,
+                .type = ball_type,
                 .x = SYS_TIMER_CLO % (SCREEN_WIDTH - BALL_WIDTH), // use system counter as random seed
                 .y = 0,
                 .width = BALL_WIDTH,
                 .height = BALL_HEIGHT,
                 .speed = BALL_SPEED,
                 .alive = 1,
-                .sprite = normal_ball
+                .sprite = sprite
             };
             drawObject(&balls[i]);
             break;
@@ -247,7 +280,7 @@ void resetPlayer(){
     player.y = PLAYER_START_Y;
 
     score = 0;
-    uart_puts("\n Reset Player Position and Score");
+    uart_puts("\nReset Player Position and Score");
 }
 
 // change the desired stage

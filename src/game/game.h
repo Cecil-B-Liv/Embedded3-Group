@@ -24,3 +24,4 @@ void updateBalls();
 void checkCollision();
 
 void checkStageProgression();
+int getRandomBallType(int stage);
