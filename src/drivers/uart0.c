@@ -254,15 +254,14 @@ char uart_get_escape_sequence() {
             default:return 0;
         }
     } else if ((unsigned char) c == 0x00 || (unsigned char) c == 0xE0) {
-        char code = uart_getc();
-        switch ((unsigned char) code) {
+        escape_seq = 0;
+        switch (c) {
             case 0x48: return 0x81; // Up arrow
             case 0x50: return 0x82; // Down arrow
             case 0x4D: return 0x83; // Right arrow
             case 0x4B: return 0x84; // Left arrow
+            default:return 0;
         }
-        return 0;
-
     } else {
         escape_seq = 0;
         return c;
