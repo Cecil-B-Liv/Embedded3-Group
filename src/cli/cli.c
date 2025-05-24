@@ -134,7 +134,7 @@ void cli_process() {
         case KEY_ARROW_RIGHT:
             // Reset cursor & redraw prompt + current input
             uart_puts("\r\033[K");
-            uart_puts(OurOs);
+            uart_puts(myOs);
             uart_puts(commandBuffer);
             break;
 
@@ -191,14 +191,13 @@ void cli_process() {
                 break;
             }
 
-            // Visual display delete for user
-            uart_sendc('\b');
-            uart_sendc(' ');
-            uart_sendc('\b');
-
-            // Modify the buffer
             cbIndex--;
             commandBuffer[cbIndex] = '\0';
+
+            // Redraw everything after deletion
+            uart_puts("\r\033[K");       // Clear line
+            uart_puts(myOs);             // Print prompt
+            uart_puts(commandBuffer);    // Print updated buffer
             break;
 
             // Prevent cursor from moving
