@@ -32,6 +32,9 @@
 #define SPEICAL_BALL_TAG  3
 #define BOMB_TAG          4
 
+#define STAGE1_SCORE    30
+#define STAGE2_SCORE    30
+#define STAGE3_SCORE    30
 
 static GameObject player = {.type = PLAYER_TAG,
                             .x = PLAYER_START_X, 
@@ -43,6 +46,10 @@ static GameObject player = {.type = PLAYER_TAG,
                             .sprite = basketball_hoops
 };
 static int score = 0;
+static int win = 0;
+
+static int current_stage_index = 1;
+const unsigned int* stages[] = { stage1, stage2, stage3 };
 static const unsigned int *current_stage = stage1;
 
 static GameObject balls[MAX_BALLS];
@@ -75,6 +82,7 @@ void gameMenu(){
                 uart_puts("\nGame enter");
                 clearScreen();
                 gameLoop();
+                
             } else {
                 uart_puts("\nGame exist");
                 clearScreen();
@@ -94,13 +102,23 @@ void gameLoop(){
     
     int frameCount = 0;
     while (1){
-
+        if (win){
+            uart_puts("\nYou win! Returning to menu...\n");
+            clearScreen();
+            win = 0;
+            current_stage_index = 0;
+            changeToStage(stages[0]);
+            drawGameBackGround(title_start);
+            return;
+        }
         // Move the balls
         updateBalls();
         checkCollision();
 
+        // Check the Score
         uart_puts("\nScore: ");
         uart_dec(score);
+        checkStageProgression();
 
         // spawn object every 60 frames
         if (frameCount % 60 == 0) { 
@@ -127,6 +145,22 @@ void gameLoop(){
         // Update frame count and wait
         frameCount++;
         wait_msec(33);
+    }
+}
+
+void checkStageProgression() {
+    if (score >= STAGE1_SCORE && current_stage_index == 1) {
+        current_stage_index = 2;
+        changeToStage(stages[1]);
+        drawGameBackGround(current_stage);
+        drawObject(&player);
+    } else if (score >= STAGE2_SCORE && current_stage_index == 2) {
+        current_stage_index = 3;
+        changeToStage(stages[2]);
+        drawGameBackGround(current_stage);
+        drawObject(&player);
+    } else if (score >= STAGE3_SCORE && current_stage_index == 3) {
+        win = 1;
     }
 }
 
@@ -219,6 +253,7 @@ void resetPlayer(){
 // change the desired stage
 void changeToStage(const unsigned int* stage){
     current_stage = stage;
+    score = 0;
 
     resetPlayer();
 }
@@ -257,3 +292,4 @@ void eraseObject(GameObject *obj) {
         }
     }
 }
+

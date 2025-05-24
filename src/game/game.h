@@ -22,3 +22,5 @@ void spawnBall();
 void updateBalls();
 
 void checkCollision();
+
+void checkStageProgression();
