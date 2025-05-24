@@ -4,6 +4,10 @@
 #include "../assets/gameAssets.h"
 #include "../util/utilsSap.h"
 
+//System Timer Counter Lower 32 bits
+#define SYS_TIMER_CLO  (* (volatile unsigned int*)(MMIO_BASE + 0x00003004))
+
+
 #define SCREEN_WIDTH    1024
 #define SCREEN_HEIGHT   768
 
@@ -36,7 +40,7 @@ static GameObject balls[MAX_BALLS];
 // static gameStage = 1;
 
 void gameMenu(){
-    drawImg(title_start, 0, 0, 1024, 768);
+    drawGameBackGround(title_start);
     int isStart = 1;
 
     uart_puts("\n Enter Game Menu");
@@ -116,11 +120,10 @@ void spawnBall() {
     // If one avaiable ball from the array
     for (int i = 0; i < MAX_BALLS; i++) {
         if (!balls[i].alive) {
-
             // Set up the ball
             balls[i] = (GameObject){
                 .type = 2,
-                .x = (i * 100) % (SCREEN_WIDTH - BALL_WIDTH),
+                .x = SYS_TIMER_CLO % (SCREEN_WIDTH - BALL_WIDTH), // use system counter as random seed
                 .y = 0,
                 .width = BALL_WIDTH,
                 .height = BALL_HEIGHT,
