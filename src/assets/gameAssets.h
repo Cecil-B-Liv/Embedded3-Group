@@ -1,0 +1,5 @@
+#include "./gameFrames/stage1.h"
+#include "./gameFrames/stage2.h"
+#include "./gameFrames/stage3.h"
+#include "./gameFrames/title_exit.h"
+#include "./gameFrames/title_start.h"

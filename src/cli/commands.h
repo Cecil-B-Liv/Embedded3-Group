@@ -26,3 +26,5 @@ void teamDisplay();
 void videoDisplay(char *arg);
 
 void getBaud();
+
+void game();
