@@ -184,22 +184,23 @@ void handShake(char *arg) {
     unsigned int handshakemode = 0;
     if (!arg || arg[0] == '\0') {
         error(arg);
+        uart_puts("\n");
         return;
     }
 
     if (strComp(arg, "On") || strComp(arg, "on")) {
         handshakemode = 1;
-    }
-
-    if (strComp(arg, "Off") || strComp(arg, "off")) {
+    } else if (strComp(arg, "Off") || strComp(arg, "off")) {
         handshakemode = 0;
     }
 
     if (handshakemode) {
+        wait_msec(100);
         uart_init(UART0_MODE_HANDSHAKE, currentbaudrate);
         uart_puts("\nSet Handshake On Succesfully.\n");
         return;
     }
+    wait_msec(100);
     uart_init(UART0_MODE_NORMAL, currentbaudrate);
     uart_puts("\nSet Handshake Off Succesfully.\n");
     return;
@@ -306,7 +307,7 @@ void videoDisplay(char *arg) {
 
     for (int i = 0; i <= 30; i++) {
         drawImg(VIDEO_ARRAY[i], 200, 215, 600, 338);
-        delay_ms(50);  // 1000 ms / 31 frames ≈ 32 ms per frame
+        wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
     }
     uart_puts("\n");
 }

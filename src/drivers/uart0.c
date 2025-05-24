@@ -24,7 +24,7 @@ void uart_init(uart_mode_t mode, int baudrate) {
     if (mode == UART0_MODE_HANDSHAKE) {
         r = GPFSEL1;
         r &= ~((7 << 18) | (7 << 21));      // Clear FSEL16, FSEL17
-        r |= (0b011 << 18) | (0b011 << 21); // ALT3
+        r |= (0b111 << 18) | (0b111 << 21); // AL
         GPFSEL1 = r;
     }
 
@@ -91,6 +91,7 @@ void uart_setBaudrate(int baudrate) {
     UART0_CR = 0x301;
     if (currentMode == UART0_MODE_HANDSHAKE) {
         UART0_CR |= UART0_CR_CTSEN | UART0_CR_RTSEN;
+        uart_puts("Handshake mode in set baudrate is on\n");
     }
 }
 
