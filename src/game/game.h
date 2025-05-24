@@ -20,3 +20,5 @@ void changeToStage(const unsigned int* stage);
 
 void spawnBall();
 void updateBalls();
+
+void checkCollision();

@@ -84,6 +84,16 @@ void gameLoop(){
     
     int frameCount = 0;
     while (1){
+
+        // Move the balls
+        updateBalls();
+        checkCollision();
+
+        // spawn object every 60 frames
+        if (frameCount % 60 == 0) { 
+            spawnBall();
+            frameCount = 0;
+        }
         
         if (uart_is_read_ready()){
             char c = uart_getc();
@@ -101,17 +111,26 @@ void gameLoop(){
             }
         }
         
-        if (frameCount % 60 == 0) { // spawn object every 60 frames
-            spawnBall();
-            frameCount = 0;
-        }
-
-        // Move the balls
-        updateBalls();
-        
         // Update frame count and wait
         frameCount++;
         wait_msec(33);
+    }
+}
+
+void checkCollision(){
+    for (int i = 0; i < MAX_BALLS; i++) {
+        // only check if the ball is alive
+        if (!balls[i].alive) continue;
+
+        // collision checking
+        if (player.x < balls[i].x + balls[i].width &&
+            player.x + player.width > balls[i].x &&
+            player.y < balls[i].y + balls[i].height &&
+            player.y + player.height > balls[i].y) {
+
+            balls[i].alive = 0;           // mark as caught
+            eraseObject(&balls[i]);      // visually remove
+        }
     }
 }
 
