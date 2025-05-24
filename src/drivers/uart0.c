@@ -233,4 +233,38 @@ void uart_mac_formater(unsigned int num)
     }
 }
 
+char uart_get_escape_sequence() {
+    static uint8_t escape_seq = 0;
+    char c = uart_getc();
+
+    if (escape_seq == 0 && c == 0x1B) {
+        escape_seq = 1;
+        return 0; // signal "in progress"
+    } else if (escape_seq == 1 && c == '[') {
+        escape_seq = 2;
+        return 0;
+    } else if (escape_seq == 2) {
+        escape_seq = 0;
+        switch (c) {
+            case 'A':return 0x81;  // Up arrow
+            case 'B':return 0x82;  // Down arrow
+            case 'C':return 0x83;  // Right arrow
+            case 'D':return 0x84;  // Left arrow
+            default:return 0;
+        }
+    } else if ((unsigned char) c == 0x00 || (unsigned char) c == 0xE0) {
+        escape_seq = 0;
+        switch (c) {
+            case 0x48: return 0x81; // Up arrow
+            case 0x50: return 0x82; // Down arrow
+            case 0x4D: return 0x83; // Right arrow
+            case 0x4B: return 0x84; // Left arrow
+            default:return 0;
+        }
+    } else {
+        escape_seq = 0;
+        return c;
+    }
+}
+
 #endif

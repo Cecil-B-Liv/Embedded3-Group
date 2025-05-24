@@ -8,8 +8,8 @@
 
 //Pixel Order: BGR in memory order (little endian --> RGB in byte order)
 #define PIXEL_ORDER 0
-#define HEIGHT 768
-#define WIDTH 1024
+#define HEIGHT 600
+#define WIDTH 900
 
 //Screen info
 unsigned int width, height, pitch;
@@ -222,7 +222,7 @@ void drawImg(int pixel_data[], int pos_y, int pos_x, int pic_width, int pic_heig
 
 void clearScreen() {
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        drawPixelARGB32(i%WIDTH, i/WIDTH, 0x00000000);
+        drawPixelARGB32(i % WIDTH, i / WIDTH, 0x00000000);
     }
 }
 
