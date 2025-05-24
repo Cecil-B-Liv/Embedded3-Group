@@ -3,7 +3,7 @@
 #include "../assets/testImg.h"
 #include "../assets/videoFrames/AK/AK47Video_part1.h"
 #include "../assets/videoFrames/AK/AK47Video_part2.h"
-#include "../assets/background.h"
+#include "../assets/video.h"
 #include "../drivers/framebf.h"
 #include "../drivers/mbox.h"
 #include "../drivers/uart0.h"
@@ -397,18 +397,19 @@ void videoDisplay(char *arg)
     }
 
     drawImg(background, 0, 0, 1024, 768);
+    drawImg(VIDEO_ARRAY[0], 200, 215, 600, 338);
 
-    for (int i = 0; i <= 24; i++)
-    {
-        drawImg(AK_part1_allArray[i], 200, 215, 700, 338);
-        wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-    }
+    // for (int i = 0; i <= 24; i++)
+    // {
+    //     drawImg(AK_part1_allArray[i], 200, 215, 700, 338);
+    //     wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+    // }
 
-    for (int i = 0; i <= 24; i++)
-    {
-        drawImg(AK_part2_allArray[i], 200, 215, 700, 338);
-        wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-    }
+    // for (int i = 0; i <= 24; i++)
+    // {
+    //     drawImg(AK_part2_allArray[i], 200, 215, 700, 338);
+    //     wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+    // }
     uart_puts("\n");
 }
 
