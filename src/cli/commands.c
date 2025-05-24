@@ -5,6 +5,7 @@
 #include "../assets/videoFrames/AK/AK47Video_part2.h"
 #include "../assets/video.h"
 #include "../drivers/framebf.h"
+#include "../assets/testVideo.h"
 #include "../drivers/mbox.h"
 #include "../drivers/uart0.h"
 #include "../util/stringUtil.h"
@@ -397,7 +398,7 @@ void videoDisplay(char *arg)
     }
 
     drawImg(background, 0, 0, 1024, 768);
-    drawImg(VIDEO_ARRAY[0], 200, 215, 600, 338);
+    drawImg(testVideo, 200, 215, 600, 338);
 
     // for (int i = 0; i <= 24; i++)
     // {
