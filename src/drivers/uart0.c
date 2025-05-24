@@ -57,11 +57,13 @@ void uart_init(uart_mode_t mode, int baudrate)
     UART0_IMSC = 0;
     UART0_ICR = 0x7FF;
 
-    // UART0_IBRD = 26;
-    // UART0_FBRD = 3;
-    int *BR = caculate_IBRD(baudrate);
-    UART0_IBRD = BR[0]; // Integer part
-    UART0_FBRD = BR[1]; // Fractional part
+    UART0_IBRD = 26;
+    UART0_FBRD = 3;
+
+    // int *BR = caculate_IBRD(baudrate);
+    // UART0_IBRD = BR[0]; // Integer part
+    // UART0_FBRD = BR[1]; // Fractional part
+
 
     UART0_LCRH = UART0_LCRH_FEN | UART0_LCRH_WLEN_8BIT;
 
@@ -199,25 +201,43 @@ void uart_dec(int num)
     uart_puts(str);
 }
 
+// int *caculate_IBRD(int baudrate)
+// {
+
+//     static int BR[2] = {0};
+
+//     unsigned int r;
+//     unsigned int UART_CLOCK = 4000000; // 4MHz
+//     float divider = (float)UART_CLOCK / (16 * baudrate);
+
+//     r = (unsigned int)divider; // Integer part of the divider
+//     BR[0] = r;                 // Integer part
+
+//     float fractional = divider - r;
+//     unsigned int n = (unsigned int)(fractional * 64 + 0.5);
+
+//     BR[1] = n; // Fractional part
+
+//     return BR;
+// }
+
 int *caculate_IBRD(int baudrate)
 {
-
     static int BR[2] = {0};
 
-    unsigned int r;
-    unsigned int UART_CLOCK = 4000000; // 4MHz
+    unsigned int UART_CLOCK = 48000000; // Correct UART clock for Pi 3
     float divider = (float)UART_CLOCK / (16 * baudrate);
 
-    r = (unsigned int)divider; // Integer part of the divider
-    BR[0] = r;                 // Integer part
+    unsigned int integer = (unsigned int)divider;
+    float fractional = divider - integer;
+    unsigned int frac = (unsigned int)(fractional * 64 + 0.5f);
 
-    float fractional = divider - r;
-    unsigned int n = (unsigned int)(fractional * 64 + 0.5);
-
-    BR[1] = n; // Fractional part
+    BR[0] = integer; // IBRD
+    BR[1] = frac;    // FBRD
 
     return BR;
 }
+
 
 void uart_mac_formater(unsigned int num)
 {

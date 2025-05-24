@@ -56,25 +56,47 @@ void mailbox_send(uint32_t msg, unsigned char channel)
 /**
 * Make a mailbox call. Returns 0 on failure, non-zero on success
 */
+// int mbox_call(unsigned int buffer_addr, unsigned char channel)
+// {
+//     //Check Buffer Address
+//     uart_puts("\nBuffer Address: ");
+//     uart_hex(buffer_addr);
+
+//     //Prepare Data (address of Message Buffer)
+//     unsigned int msg = (buffer_addr & ~0xF) | (channel & 0xF);
+//     mailbox_send(msg, channel);
+
+//     /* now wait for the response */
+//     /* is it a response to our message (same address)? */
+//     if (msg == mailbox_read(channel)) {
+//         /* is it a valid successful response (Response Code) ? */
+//         if (mBuf[1] == MBOX_RESPONSE)
+//             uart_puts("\nGot successful response ");
+
+//         return (mBuf[1] == MBOX_RESPONSE);
+//     }
+
+//     return 0;
+// }
 int mbox_call(unsigned int buffer_addr, unsigned char channel)
 {
-    //Check Buffer Address
     uart_puts("\nBuffer Address: ");
     uart_hex(buffer_addr);
 
-    //Prepare Data (address of Message Buffer)
     unsigned int msg = (buffer_addr & ~0xF) | (channel & 0xF);
     mailbox_send(msg, channel);
 
-    /* now wait for the response */
-    /* is it a response to our message (same address)? */
-    if (msg == mailbox_read(channel)) {
-        /* is it a valid successful response (Response Code) ? */
-        if (mBuf[1] == MBOX_RESPONSE)
-            uart_puts("\nGot successful response ");
-
-        return (mBuf[1] == MBOX_RESPONSE);
+    // Wait for response with matching message
+    while (1) {
+        uint32_t res = mailbox_read(channel);
+        if (res == msg) break;
     }
 
+    if (mBuf[1] == MBOX_RESPONSE) {
+        uart_puts("\nGot successful response.");
+        return 1;
+    }
+
+    uart_puts("\n[ERROR] Mailbox call failed.");
     return 0;
 }

@@ -9,6 +9,7 @@
 #include "../util/time.h"
 #include "../util/utilsSap.h"
 
+#define myOs "FixingGoodOS>"
 #define MAX_COMMAND_NUMBER 7
 
 static int currentbaudrate = 115200;
@@ -70,65 +71,132 @@ void help(char *arg) {
         uart_puts(commands[i].name);
         uart_puts(commands[i].des);
     }
+
+    uart_puts("\n");
 }
 
 void clear(char *arg) {
-    // This command accept no argument
     if (arg != 0) {
         error(arg);
         return;
     }
 
-    // move the cursor to the location where user cannot see
-    for (int i = 0; i < 50; i++) {
+    uart_puts("\033[2J");  // Clear screen
+    uart_puts("\033[H");   // Move cursor to top
+
+    // Backup: scroll buffer if ANSI fails
+    for (int i = 0; i < 20; i++) {
         uart_sendc('\n');
     }
 }
 
+
+// void showInfo(char *arg) {
+//     // This command accept no argument
+//     if (arg != 0) {
+//         error(arg);
+//         return;
+//     }
+
+//     // Mail Box Request
+//     // mailbox data buffer
+//     mBuf[0] = 11 * 4;        // Message Buffer Size in bytes
+//     mBuf[1] = MBOX_REQUEST;  // Message Request Code (this is a request message)
+
+//     mBuf[2] = 0x00010002;  // Board Revision
+//     mBuf[3] = 4;           // Value buffer size in bytes (max of request and response lengths)
+//     mBuf[4] = 0;           // REQUEST CODE = 0
+//     mBuf[5] = 0;           // Board Revision Value
+
+//     mBuf[6] = 0x00010003;  // Board MAC Adress
+//     mBuf[7] = 6;           // Value buffer size in bytes (max of request and response lengths)
+//     mBuf[8] = 0;           // REQUEST CODE = 0
+//     mBuf[9] = 0;           // Board MAC address Value
+
+//     mBuf[10] = MBOX_TAG_LAST;
+
+//     // Call the Mail Box and get responses
+//     uart_puts("\nGetting board revision and MAC address...\n");
+//     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
+//         // Varriable to hold the value of board revision and MAC Adress
+//         int boardRev = mBuf[5];
+//         char *mac = (char *)&mBuf[9];
+
+//         // Board Revision Information
+//         uart_puts("\nBoard Revision: ");
+//         uart_hex(boardRev);
+//         uart_puts("\n");
+//         uart_puts(getBoardModel(boardRev));
+
+//         // MAC Adress (6 values format)
+//         uart_puts("\nMAC Address: ");
+//         for (int i = 0; i < 6; i++) {
+//             uart_mac_formater((unsigned char)mac[i]);
+//             if (i < 5) uart_puts(":");
+//         }
+//     } else {
+//         uart_puts("\n[ERROR] Unable to query!\n");
+//     }
+
+//     uart_puts("\n");
+// }
+
 void showInfo(char *arg) {
-    // This command accept no argument
     if (arg != 0) {
         error(arg);
         return;
     }
 
-    // Mail Box Request
-    // mailbox data buffer
-    mBuf[0] = 11 * 4;        // Message Buffer Size in bytes
-    mBuf[1] = MBOX_REQUEST;  // Message Request Code (this is a request message)
+    // === Board Revision ===
+    uart_puts("\n[INFO] Requesting BOARD REVISION...\n");
 
-    mBuf[2] = 0x00010002;  // Board Revision
-    mBuf[3] = 4;           // Value buffer size in bytes (max of request and response lengths)
-    mBuf[4] = 0;           // REQUEST CODE = 0
-    mBuf[5] = 0;           // Board Revision Value
+    mBuf[0] = 8 * 4;
+    mBuf[1] = MBOX_REQUEST;
 
-    mBuf[6] = 0x00010003;  // Board MAC Adress
-    mBuf[7] = 6;           // Value buffer size in bytes (max of request and response lengths)
-    mBuf[8] = 0;           // REQUEST CODE = 0
-    mBuf[9] = 0;           // Board MAC address Value
+    mBuf[2] = 0x00010002; // Board Revision tag
+    mBuf[3] = 4;
+    mBuf[4] = 0;
+    mBuf[5] = 0;
 
-    mBuf[10] = MBOX_TAG_LAST;
+    mBuf[6] = MBOX_TAG_LAST;
 
-    // Call the Mail Box and get responses
     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
-        // Varriable to hold the value of board revision and MAC Adress
-        int boardRev = mBuf[5];
-        char *mac = (char *)&mBuf[9];
-
-        // Board Revision Information
+        int rev = mBuf[5];
         uart_puts("\nBoard Revision: ");
-        uart_hex(boardRev);
+        uart_hex(rev);
         uart_puts("\n");
-        uart_puts(getBoardModel(boardRev));
+        uart_puts(getBoardModel(rev));
+    } else {
+        uart_puts("\n[ERROR] Failed to get board revision.\n");
+    }
 
-        // MAC Adress (6 values format)
+    // === MAC Address ===
+    uart_puts("\n[INFO] Requesting MAC ADDRESS...\n");
+
+    mBuf[0] = 9 * 4;
+    mBuf[1] = MBOX_REQUEST;
+
+    mBuf[2] = 0x00010003; // MAC Address tag
+    mBuf[3] = 6;
+    mBuf[4] = 0;
+    mBuf[5] = 0; // MAC part 1
+    mBuf[6] = 0; // MAC part 2
+
+    mBuf[7] = MBOX_TAG_LAST;
+
+    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
+        unsigned char *mac = (unsigned char *)&mBuf[5];
         uart_puts("\nMAC Address: ");
         for (int i = 0; i < 6; i++) {
-            uart_mac_formater((unsigned char)mac[i]);
+            uart_mac_formater(mac[i]);
             if (i < 5) uart_puts(":");
         }
+        uart_puts("\n");
+    } else {
+        uart_puts("\n[ERROR] Failed to get MAC address.\n");
     }
 }
+
 
 void baudRate(char *arg) {
     if (!arg || arg[0] == '\0') {
@@ -196,14 +264,42 @@ void error(char *error) {
     uart_puts(" is not recognized");
 }
 
-// use to store the information of the board revision
 char *getBoardModel(int rev) {
+    // New-style revision format (bit 23 set)
+    if ((rev & (1 << 23)) != 0) {
+        int model = (rev >> 4) & 0xFF;
+
+        switch (model) {
+            case 0x00: return "Model: A\nRAM: 256MB\nRevision: 1.0";
+            case 0x01: return "Model: B\nRAM: 256MB\nRevision: 1.0/1.1";
+            case 0x02: return "Model: A+\nRAM: 256MB or 512MB\nRevision: 1.1";
+            case 0x03: return "Model: B+\nRAM: 512MB\nRevision: 1.2";
+            case 0x04: return "Model: 2B\nRAM: 1GB\nRevision: 1.0";
+            case 0x06: return "Model: CM1\nRAM: 512MB\nRevision: 1.0";
+            case 0x08: return "Model: 3B\nRAM: 1GB\nRevision: 1.2";
+            case 0x09: return "Model: Zero\nRAM: 512MB\nRevision: 1.2";
+            case 0x0C: return "Model: Zero W\nRAM: 512MB\nRevision: 1.1";
+            case 0x0D: return "Model: 3B+\nRAM: 1GB\nRevision: 1.3";
+            case 0x0E: return "Model: 3A+\nRAM: 512MB\nRevision: 1.0";
+            case 0x10: return "Model: CM3+\nRAM: 1GB\nRevision: 1.0";
+            case 0x11: return "Model: 4B\nRAM: 1GB\nRevision: 1.1";
+            case 0x12: return "Model: 4B\nRAM: 2GB\nRevision: 1.2";
+            case 0x13: return "Model: 4B\nRAM: 4GB\nRevision: 1.2";
+            case 0x14: return "Model: 4B\nRAM: 8GB\nRevision: 1.4";
+            case 0x15: return "Model: 400\nRAM: 4GB\nRevision: 1.0";
+            case 0x19: return "Model: Zero 2 W\nRAM: 512MB or 1GB\nRevision: 1.0";
+            case 0x1A: return "Model: 3A+ (alternate)\nRAM: 512MB\nRevision: 1.1";
+            default:
+                return "Model: Unknown (new-style revision)";
+        }
+    }
+
+    // Old-style revision format
     switch (rev) {
         case 0x0002:
             return "Model: Model B Rev 1\nRAM: 256MB\nRevision: none";
         case 0x0003:
-            return "Model: Model B Rev 1 (ECN0001, no fuses, D14 removed)\nRAM: 256MB\nRevision: "
-                   "none";
+            return "Model: Model B Rev 1 (ECN0001)\nRAM: 256MB\nRevision: none";
         case 0x0004:
         case 0x0005:
         case 0x0006:
@@ -223,15 +319,15 @@ char *getBoardModel(int rev) {
         case 0x0011:
             return "Model: Compute Module\nRAM: 512MB\nRevision: none";
         case 0x0014:
-            return "Model: Compute Module (Embest, China)\nRAM: 512MB\nRevision: none";
+            return "Model: Compute Module (Embest)\nRAM: 512MB\nRevision: none";
         case 0x0012:
             return "Model: Model A+\nRAM: 256MB\nRevision: none";
         case 0x0015:
             return "Model: Model A+ (Embest)\nRAM: 256MB or 512MB\nRevision: none";
         case 0xa01041:
-            return "Model: Pi 2 Model B v1.1 (Sony, UK)\nRAM: 1GB\nRevision: 1.1";
+            return "Model: Pi 2 Model B v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
         case 0xa21041:
-            return "Model: Pi 2 Model B v1.1 (Embest, China)\nRAM: 1GB\nRevision: 1.1";
+            return "Model: Pi 2 Model B v1.1 (Embest)\nRAM: 1GB\nRevision: 1.1";
         case 0xa22042:
             return "Model: Pi 2 Model B v1.2\nRAM: 1GB\nRevision: 1.2";
         case 0x900092:
@@ -241,27 +337,27 @@ char *getBoardModel(int rev) {
         case 0x9000C1:
             return "Model: Pi Zero W\nRAM: 512MB\nRevision: 1.1";
         case 0xa02082:
-            return "Model: Pi 3 Model B (Sony, UK)\nRAM: 1GB\nRevision: 1.2";
+            return "Model: Pi 3 Model B (Sony UK)\nRAM: 1GB\nRevision: 1.2";
         case 0xa22082:
-            return "Model: Pi 3 Model B (Embest, China)\nRAM: 1GB\nRevision: 1.2";
+            return "Model: Pi 3 Model B (Embest)\nRAM: 1GB\nRevision: 1.2";
         case 0xa020d3:
-            return "Model: Pi 3 Model B+ (Sony, UK)\nRAM: 1GB\nRevision: 1.3";
+            return "Model: Pi 3 Model B+ (Sony UK)\nRAM: 1GB\nRevision: 1.3";
         case 0xa03111:
-            return "Model: Pi 4 1GB v1.1 (Sony, UK)\nRAM: 1GB\nRevision: 1.1";
+            return "Model: Pi 4 1GB v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
         case 0xb03111:
-            return "Model: Pi 4 2GB v1.1 (Sony, UK)\nRAM: 2GB\nRevision: 1.1";
+            return "Model: Pi 4 2GB v1.1 (Sony UK)\nRAM: 2GB\nRevision: 1.1";
         case 0xb03112:
-            return "Model: Pi 4 2GB v1.2 (Sony, UK)\nRAM: 2GB\nRevision: 1.2";
+            return "Model: Pi 4 2GB v1.2 (Sony UK)\nRAM: 2GB\nRevision: 1.2";
         case 0xb03114:
-            return "Model: Pi 4 2GB v1.4 (Sony, UK)\nRAM: 2GB\nRevision: 1.4";
+            return "Model: Pi 4 2GB v1.4 (Sony UK)\nRAM: 2GB\nRevision: 1.4";
         case 0xc03111:
-            return "Model: Pi 4 4GB v1.1 (Sony, UK)\nRAM: 4GB\nRevision: 1.1";
+            return "Model: Pi 4 4GB v1.1 (Sony UK)\nRAM: 4GB\nRevision: 1.1";
         case 0xc03112:
-            return "Model: Pi 4 4GB v1.2 (Sony, UK)\nRAM: 4GB\nRevision: 1.2";
+            return "Model: Pi 4 4GB v1.2 (Sony UK)\nRAM: 4GB\nRevision: 1.2";
         case 0xc03114:
-            return "Model: Pi 4 4GB v1.4 (Sony, UK)\nRAM: 4GB\nRevision: 1.4";
+            return "Model: Pi 4 4GB v1.4 (Sony UK)\nRAM: 4GB\nRevision: 1.4";
         case 0xd03114:
-            return "Model: Pi 4 8GB v1.4 (Sony, UK)\nRAM: 8GB\nRevision: 1.4";
+            return "Model: Pi 4 8GB v1.4 (Sony UK)\nRAM: 8GB\nRevision: 1.4";
         case 0xc03130:
             return "Model: Pi 400 4GB v1.0\nRAM: 4GB\nRevision: 1.0";
         case 0x902120:
@@ -270,6 +366,8 @@ char *getBoardModel(int rev) {
             return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
     }
 }
+
+
 
 void teamDisplay() {
     drawImg(background, 0, 0, 1024, 768);

@@ -1,5 +1,4 @@
 #include "cli.h"
-
 #include "../drivers/uart0.h"
 #include "../util/stringUtil.h"
 #include "commands.h"

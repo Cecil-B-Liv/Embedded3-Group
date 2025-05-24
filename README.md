@@ -5,13 +5,13 @@
 - [x] Display OS name as CLI prompt (e.g., `MyOS>`)  
 - [x] Implement command input buffer with Enter key detection  
 - [x] Support auto-completion with TAB key  
-- [] Implement command history (UP = `_`, DOWN = `+`)  
+- [x] Implement command history (UP = `_`, DOWN = `+`)  
 - [x] Allow backspace/deletion without removing OS name  
 
 ### Commands to implement
 - [x] `help` – list and explain commands  
 - [x] `clear` – clear/scroll the screen  
-- [`Mac show wrong format`] `showinfo` – show board revision + MAC address  
+- [x] `showinfo` – show board revision + MAC address  
 - [] `baudrate` – allow changing UART baud rate  
 - [] `handshake` – enable/disable UART CTS/RTS  
 
