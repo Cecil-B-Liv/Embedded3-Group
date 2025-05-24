@@ -12,10 +12,26 @@
 #define PLAYER_WIDTH    100
 #define PLAYER_HEIGHT   100
 #define PLAYER_SPEED    10
+#define MAX_BALLS       10
 
-static GameObject player = {1, PLAYER_START_X, PLAYER_START_Y, PLAYER_HEIGHT , PLAYER_WIDTH, PLAYER_SPEED, 1, basketball_hoops};
+#define BALL_WIDTH      32
+#define BALL_HEIGHT     32
+#define BALL_SPEED      5
+#define MAX_BALLS       10
+
+static GameObject player = {.type = 1,
+                            .x = PLAYER_START_X, 
+                            .y = PLAYER_START_Y, 
+                            .height = PLAYER_HEIGHT, 
+                            .width = PLAYER_WIDTH, 
+                            .speed = PLAYER_SPEED, 
+                            .alive = 1,
+                            .sprite = basketball_hoops
+};
 static int score = 0;
 static unsigned int *current_stage = stage1;
+
+static GameObject balls[MAX_BALLS];
 
 // static gameStage = 1;
 
@@ -70,10 +86,10 @@ void gameLoop(){
         
             switch (c){
             case 'a':
-                moveObject(&player, -1);
+                moveObject(&player, -1, 0);
                 break;
             case 'd':
-                moveObject(&player, +1);
+                moveObject(&player, +1, 0);
                 break;
 
             default:
@@ -91,6 +107,26 @@ void gameLoop(){
     }
 }
 
+void spawnBall() {
+    for (int i = 0; i < MAX_BALLS; i++) {
+        if (!balls[i].alive) {
+            balls[i] = (GameObject){
+                .type = 2,
+                .x = (i * 100) % (SCREEN_WIDTH - BALL_WIDTH),
+                .y = 0,
+                .width = BALL_WIDTH,
+                .height = BALL_HEIGHT,
+                .speed = BALL_SPEED,
+                .alive = 1,
+                .sprite = normal_ball
+            };
+            drawObject(&balls[i]);
+            break;
+        }
+    }
+}
+
+// Reset the player position
 void resetPlayer(){
     player.x = PLAYER_START_X;
     player.y = PLAYER_START_Y;
@@ -99,6 +135,7 @@ void resetPlayer(){
     uart_puts("\n Reset Player Position and Score");
 }
 
+// change the desired stage
 void changeToStage(const unsigned int* stage){
     current_stage = stage;
 
@@ -114,18 +151,19 @@ void drawObject(GameObject *obj){
     drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height);
 }
 
-void moveObject(GameObject *obj, int direct){
+void moveObject(GameObject *obj, int dx, int dy){
     eraseObject(obj);
+    obj->x += obj->speed * dx;
+    obj->y += obj->speed * dy;
 
-    // Validate the value
-    obj->x += obj->speed * direct;
+    if (obj->x < 0) obj->x = 0;
+    if (obj->x + obj->width > SCREEN_WIDTH) obj->x = SCREEN_WIDTH - obj->width;
+    if (obj->y < 0) obj->y = 0;
+    if (obj->y + obj->height > SCREEN_HEIGHT) obj->y = SCREEN_HEIGHT - obj->height;
 
-    if (obj->x < 0) obj->x = 0; // if touch the left boarder
-    if (obj->x + obj->width > SCREEN_WIDTH) obj->x = SCREEN_WIDTH - obj->width; // if touch the right  border
-
-    // Redraw new object
     drawObject(obj);
 }
+
 
 // Fill the old object with the respected background area
 void eraseObject(GameObject *obj) {

@@ -8,7 +8,7 @@ typedef struct {
 } GameObject;
 
 void gameLoop();
-void moveObject(GameObject *obj, int dx);
+void moveObject(GameObject *obj, int dx, int dy);
 void drawObject(GameObject *obj);
 void eraseObject(GameObject *obj);
 void delayFrame();
