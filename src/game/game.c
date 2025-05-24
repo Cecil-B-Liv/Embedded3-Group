@@ -14,8 +14,8 @@
 #define PLAYER_SPEED    10
 #define MAX_BALLS       10
 
-#define BALL_WIDTH      32
-#define BALL_HEIGHT     32
+#define BALL_WIDTH      50
+#define BALL_HEIGHT     50
 #define BALL_SPEED      5
 #define MAX_BALLS       10
 
@@ -98,18 +98,26 @@ void gameLoop(){
         }
         
         if (frameCount % 60 == 0) { // spawn object every 60 frames
-            uart_puts("\n Ball");
+            spawnBall();
             frameCount = 0;
         }
 
+        // Move the balls
+        updateBalls();
+        
+        // Update frame count and wait
         frameCount++;
         wait_msec(33);
     }
 }
 
+// spawn the ball from the array
 void spawnBall() {
+    // If one avaiable ball from the array
     for (int i = 0; i < MAX_BALLS; i++) {
         if (!balls[i].alive) {
+
+            // Set up the ball
             balls[i] = (GameObject){
                 .type = 2,
                 .x = (i * 100) % (SCREEN_WIDTH - BALL_WIDTH),
@@ -123,6 +131,26 @@ void spawnBall() {
             drawObject(&balls[i]);
             break;
         }
+    }
+}
+
+// Update the ball position
+void updateBalls() {
+    for (int i = 0; i < MAX_BALLS; i++) {
+        if (!balls[i].alive) continue;
+
+        // Erase before moving
+        eraseObject(&balls[i]);
+        balls[i].y += balls[i].speed;
+
+        // If ball reaches the bottom, mark as not alive and erase
+        if (balls[i].y + balls[i].height >= SCREEN_HEIGHT) {
+            balls[i].alive = 0;
+            eraseObject(&balls[i]);
+            continue;
+        }
+
+        drawObject(&balls[i]);
     }
 }
 

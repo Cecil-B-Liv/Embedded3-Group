@@ -11,11 +11,12 @@ void gameLoop();
 void moveObject(GameObject *obj, int dx, int dy);
 void drawObject(GameObject *obj);
 void eraseObject(GameObject *obj);
-void delayFrame();
-
 
 void gameMenu();
 void drawGameBackGround(const unsigned int* bg);
 
 void resetPlayer();
 void changeToStage(const unsigned int* stage);
+
+void spawnBall();
+void updateBalls();
