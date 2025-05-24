@@ -183,4 +183,6 @@ void uart_mac_formatter(unsigned int num);
 
 char uart_get_escape_sequence();
 
+int uart_is_read_ready();
+
 #endif // EMBEDDED3_GROUP_UART0_H

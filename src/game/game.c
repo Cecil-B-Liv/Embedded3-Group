@@ -2,6 +2,7 @@
 #include "../drivers/uart0.h"
 #include "../drivers/framebf.h"
 #include "../assets/gameAssets.h"
+#include "../util/utilsSap.h"
 
 #define SCREEN_WIDTH    1024
 #define SCREEN_HEIGHT   768
@@ -61,20 +62,32 @@ void gameLoop(){
     drawGameBackGround(current_stage);
     drawObject(&player);
     
+    int frameCount = 0;
     while (1){
-        char c = uart_getc();
         
-        switch (c){
-        case 'a':
-            moveObject(&player, -1);
-            break;
-        case 'd':
-            moveObject(&player, +1);
-            break;
+        if (uart_is_read_ready()){
+            char c = uart_getc();
+        
+            switch (c){
+            case 'a':
+                moveObject(&player, -1);
+                break;
+            case 'd':
+                moveObject(&player, +1);
+                break;
 
-        default:
-            break;
+            default:
+                break;
+            }
         }
+        
+        if (frameCount % 60 == 0) { // spawn object every 60 frames
+            uart_puts("\n Ball");
+            frameCount = 0;
+        }
+
+        frameCount++;
+        wait_msec(33);
     }
 }
 

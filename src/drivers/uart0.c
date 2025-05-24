@@ -260,4 +260,10 @@ char uart_get_escape_sequence() {
     }
 }
 
+// Check state of the uart
+int uart_is_read_ready() {
+    // If RXFE (Receive FIFO Empty) is 0, there is data to read
+    return !(UART0_FR & UART0_FR_RXFE);
+}
+
 #endif
