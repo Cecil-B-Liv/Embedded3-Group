@@ -11,8 +11,8 @@
 #define SCREEN_WIDTH    1024
 #define SCREEN_HEIGHT   768
 
-#define PLAYER_START_X  500
-#define PLAYER_START_Y  600
+#define PLAYER_START_X  412
+#define PLAYER_START_Y  568
 #define PLAYER_WIDTH    100
 #define PLAYER_HEIGHT   100
 #define PLAYER_SPEED    10
@@ -23,17 +23,27 @@
 #define BALL_SPEED      5
 #define MAX_BALLS       10
 
-static GameObject player = {.type = 1,
+#define NORMAL_SCORE    10
+#define SPECIAL_SCORE   30
+#define BOMB_SCORE     -100
+
+#define PLAYER_TAG        1
+#define NORMAL_BALL_TAG   2
+#define SPEICAL_BALL_TAG  3
+#define BOMB_TAG          4
+
+
+static GameObject player = {.type = PLAYER_TAG,
                             .x = PLAYER_START_X, 
                             .y = PLAYER_START_Y, 
                             .height = PLAYER_HEIGHT, 
                             .width = PLAYER_WIDTH, 
-                            .speed = PLAYER_SPEED, 
+                            .speed = PLAYER_SPEED,
                             .alive = 1,
                             .sprite = basketball_hoops
 };
 static int score = 0;
-static unsigned int *current_stage = stage1;
+static const unsigned int *current_stage = stage1;
 
 static GameObject balls[MAX_BALLS];
 
@@ -89,6 +99,9 @@ void gameLoop(){
         updateBalls();
         checkCollision();
 
+        uart_puts("\nScore: ");
+        uart_dec(score);
+
         // spawn object every 60 frames
         if (frameCount % 60 == 0) { 
             spawnBall();
@@ -130,6 +143,23 @@ void checkCollision(){
 
             balls[i].alive = 0;           // mark as caught
             eraseObject(&balls[i]);      // visually remove
+
+            // score checking
+            // normal ball
+            if (balls[i].type == NORMAL_BALL_TAG){
+                score += NORMAL_SCORE;
+                continue;
+            }
+            // Special ball
+            if (balls[i].type == SPEICAL_BALL_TAG){
+                score += NORMAL_SCORE;
+                continue;
+            }
+            // Bomb
+            if (balls[i].type == BOMB_TAG){
+                score += NORMAL_SCORE;
+                continue;
+            }
         }
     }
 }
@@ -141,7 +171,7 @@ void spawnBall() {
         if (!balls[i].alive) {
             // Set up the ball
             balls[i] = (GameObject){
-                .type = 2,
+                .type = NORMAL_BALL_TAG,
                 .x = SYS_TIMER_CLO % (SCREEN_WIDTH - BALL_WIDTH), // use system counter as random seed
                 .y = 0,
                 .width = BALL_WIDTH,
@@ -166,7 +196,8 @@ void updateBalls() {
         balls[i].y += balls[i].speed;
 
         // If ball reaches the bottom, mark as not alive and erase
-        if (balls[i].y + balls[i].height >= SCREEN_HEIGHT) {
+        // Bottom will count as the foot of the player
+        if (balls[i].y + balls[i].height >= PLAYER_START_Y + PLAYER_HEIGHT) { 
             balls[i].alive = 0;
             eraseObject(&balls[i]);
             continue;
