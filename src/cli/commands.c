@@ -16,14 +16,14 @@
 static int currentbaudrate = 115200;
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
-    {"help", "                          Show brief information of all commands", help},
-    {"clear", "                         Clear screen", clear},
-    {"showinfo", "                      Show board revision and board MAC address", showInfo},
-    {"baudRate","                       Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
-    {"handShake", "                     Allow the user to turn on/off CTS/RTS handshaking", handShake},
-    {"teamDisplay", "                   Display all team members name on the screen", teamDisplay},
-    {"videoDisplay", "                  Display the video", videoDisplay},
-    {"game","                           Enter the game menu", game}};
+        {"help",         "                          Show brief information of all commands",                                                                                                       help},
+        {"clear",        "                         Clear screen",                                                                                                                                  clear},
+        {"showinfo",     "                      Show board revision and board MAC address",                                                                                                        showInfo},
+        {"baudRate",     "                       Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
+        {"handShake",    "                     Allow the user to turn on/off CTS/RTS handshaking",                                                                                                 handShake},
+        {"teamDisplay",  "                   Display all team members name on the screen",                                                                                                         teamDisplay},
+        {"videoDisplay", "                  Display the video",                                                                                                                                    videoDisplay},
+        {"game",         "                           Enter the game menu",                                                                                                                         game}};
 
 void cmdProcess(char *cmdBuff) {
     // Split the original buffer too two, cmd and argument
@@ -91,57 +91,6 @@ void clear(char *arg) {
         uart_sendc('\n');
     }
 }
-
-
-// void showInfo(char *arg) {
-//     // This command accept no argument
-//     if (arg != 0) {
-//         error(arg);
-//         return;
-//     }
-
-//     // Mail Box Request
-//     // mailbox data buffer
-//     mBuf[0] = 11 * 4;        // Message Buffer Size in bytes
-//     mBuf[1] = MBOX_REQUEST;  // Message Request Code (this is a request message)
-
-//     mBuf[2] = 0x00010002;  // Board Revision
-//     mBuf[3] = 4;           // Value buffer size in bytes (max of request and response lengths)
-//     mBuf[4] = 0;           // REQUEST CODE = 0
-//     mBuf[5] = 0;           // Board Revision Value
-
-//     mBuf[6] = 0x00010003;  // Board MAC Adress
-//     mBuf[7] = 6;           // Value buffer size in bytes (max of request and response lengths)
-//     mBuf[8] = 0;           // REQUEST CODE = 0
-//     mBuf[9] = 0;           // Board MAC address Value
-
-//     mBuf[10] = MBOX_TAG_LAST;
-
-//     // Call the Mail Box and get responses
-//     uart_puts("\nGetting board revision and MAC address...\n");
-//     if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
-//         // Varriable to hold the value of board revision and MAC Adress
-//         int boardRev = mBuf[5];
-//         char *mac = (char *)&mBuf[9];
-
-//         // Board Revision Information
-//         uart_puts("\nBoard Revision: ");
-//         uart_hex(boardRev);
-//         uart_puts("\n");
-//         uart_puts(getBoardModel(boardRev));
-
-//         // MAC Adress (6 values format)
-//         uart_puts("\nMAC Address: ");
-//         for (int i = 0; i < 6; i++) {
-//             uart_mac_formater((unsigned char)mac[i]);
-//             if (i < 5) uart_puts(":");
-//         }
-//     } else {
-//         uart_puts("\n[ERROR] Unable to query!\n");
-//     }
-
-//     uart_puts("\n");
-// }
 
 void showInfo(char *arg) {
     if (arg != 0) {
@@ -218,8 +167,7 @@ void baudRate(char *arg) {
         case 19200:
         case 38400:
         case 57600:
-        case 115200:
-            uart_puts("\nBaud rate set successfully.\n");
+        case 115200:uart_puts("\nBaud rate set successfully.\n");
             currentbaudrate = baud;
             uart_puts("Now using ");
             uart_dec(baud);
@@ -227,8 +175,7 @@ void baudRate(char *arg) {
             wait_msec(100);  // ensure no fuckery
             uart_setBaudrate(baud);
             break;
-        default:
-            uart_puts("\n[ERROR] Unsupported baud rate.\n");
+        default:uart_puts("\n[ERROR] Unsupported baud rate.\n");
             break;
     }
 }
@@ -272,119 +219,69 @@ char *getBoardModel(int rev) {
         int model = (rev >> 4) & 0xFF;
 
         switch (model) {
-            case 0x00:
-                return "Model: A\nRAM: 256MB\nRevision: 1.0";
-            case 0x01:
-                return "Model: B\nRAM: 256MB\nRevision: 1.0/1.1";
-            case 0x02:
-                return "Model: A+\nRAM: 256MB or 512MB\nRevision: 1.1";
-            case 0x03:
-                return "Model: B+\nRAM: 512MB\nRevision: 1.2";
-            case 0x04:
-                return "Model: 2B\nRAM: 1GB\nRevision: 1.0";
-            case 0x06:
-                return "Model: CM1\nRAM: 512MB\nRevision: 1.0";
-            case 0x08:
-                return "Model: 3B\nRAM: 1GB\nRevision: 1.2";
-            case 0x09:
-                return "Model: Zero\nRAM: 512MB\nRevision: 1.2";
-            case 0x0C:
-                return "Model: Zero W\nRAM: 512MB\nRevision: 1.1";
-            case 0x0D:
-                return "Model: 3B+\nRAM: 1GB\nRevision: 1.3";
-            case 0x0E:
-                return "Model: 3A+\nRAM: 512MB\nRevision: 1.0";
-            case 0x10:
-                return "Model: CM3+\nRAM: 1GB\nRevision: 1.0";
-            case 0x11:
-                return "Model: 4B\nRAM: 1GB\nRevision: 1.1";
-            case 0x12:
-                return "Model: 4B\nRAM: 2GB\nRevision: 1.2";
-            case 0x13:
-                return "Model: 4B\nRAM: 4GB\nRevision: 1.2";
-            case 0x14:
-                return "Model: 4B\nRAM: 8GB\nRevision: 1.4";
-            case 0x15:
-                return "Model: 400\nRAM: 4GB\nRevision: 1.0";
-            case 0x19:
-                return "Model: Zero 2 W\nRAM: 512MB or 1GB\nRevision: 1.0";
-            case 0x1A:
-                return "Model: 3A+ (alternate)\nRAM: 512MB\nRevision: 1.1";
-            default:
-                return "Model: Unknown (new-style revision)";
+            case 0x00:return "Model: A\nRAM: 256MB\nRevision: 1.0";
+            case 0x01:return "Model: B\nRAM: 256MB\nRevision: 1.0/1.1";
+            case 0x02:return "Model: A+\nRAM: 256MB or 512MB\nRevision: 1.1";
+            case 0x03:return "Model: B+\nRAM: 512MB\nRevision: 1.2";
+            case 0x04:return "Model: 2B\nRAM: 1GB\nRevision: 1.0";
+            case 0x06:return "Model: CM1\nRAM: 512MB\nRevision: 1.0";
+            case 0x08:return "Model: 3B\nRAM: 1GB\nRevision: 1.2";
+            case 0x09:return "Model: Zero\nRAM: 512MB\nRevision: 1.2";
+            case 0x0C:return "Model: Zero W\nRAM: 512MB\nRevision: 1.1";
+            case 0x0D:return "Model: 3B+\nRAM: 1GB\nRevision: 1.3";
+            case 0x0E:return "Model: 3A+\nRAM: 512MB\nRevision: 1.0";
+            case 0x10:return "Model: CM3+\nRAM: 1GB\nRevision: 1.0";
+            case 0x11:return "Model: 4B\nRAM: 1GB\nRevision: 1.1";
+            case 0x12:return "Model: 4B\nRAM: 2GB\nRevision: 1.2";
+            case 0x13:return "Model: 4B\nRAM: 4GB\nRevision: 1.2";
+            case 0x14:return "Model: 4B\nRAM: 8GB\nRevision: 1.4";
+            case 0x15:return "Model: 400\nRAM: 4GB\nRevision: 1.0";
+            case 0x19:return "Model: Zero 2 W\nRAM: 512MB or 1GB\nRevision: 1.0";
+            case 0x1A:return "Model: 3A+ (alternate)\nRAM: 512MB\nRevision: 1.1";
+            default:return "Model: Unknown (new-style revision)";
         }
     }
 
     // Old-style revision format
     switch (rev) {
-        case 0x0002:
-            return "Model: Model B Rev 1\nRAM: 256MB\nRevision: none";
-        case 0x0003:
-            return "Model: Model B Rev 1 (ECN0001)\nRAM: 256MB\nRevision: none";
+        case 0x0002:return "Model: Model B Rev 1\nRAM: 256MB\nRevision: none";
+        case 0x0003:return "Model: Model B Rev 1 (ECN0001)\nRAM: 256MB\nRevision: none";
         case 0x0004:
         case 0x0005:
-        case 0x0006:
-            return "Model: Model B Rev 2\nRAM: 256MB\nRevision: none";
+        case 0x0006:return "Model: Model B Rev 2\nRAM: 256MB\nRevision: none";
         case 0x0007:
         case 0x0008:
-        case 0x0009:
-            return "Model: Model A\nRAM: 256MB\nRevision: none";
+        case 0x0009:return "Model: Model A\nRAM: 256MB\nRevision: none";
         case 0x000d:
         case 0x000e:
-        case 0x000f:
-            return "Model: Model B Rev 2\nRAM: 512MB\nRevision: none";
+        case 0x000f:return "Model: Model B Rev 2\nRAM: 512MB\nRevision: none";
         case 0x0010:
         case 0x0013:
-        case 0x900032:
-            return "Model: Model B+\nRAM: 512MB\nRevision: none";
-        case 0x0011:
-            return "Model: Compute Module\nRAM: 512MB\nRevision: none";
-        case 0x0014:
-            return "Model: Compute Module (Embest)\nRAM: 512MB\nRevision: none";
-        case 0x0012:
-            return "Model: Model A+\nRAM: 256MB\nRevision: none";
-        case 0x0015:
-            return "Model: Model A+ (Embest)\nRAM: 256MB or 512MB\nRevision: none";
-        case 0xa01041:
-            return "Model: Pi 2 Model B v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
-        case 0xa21041:
-            return "Model: Pi 2 Model B v1.1 (Embest)\nRAM: 1GB\nRevision: 1.1";
-        case 0xa22042:
-            return "Model: Pi 2 Model B v1.2\nRAM: 1GB\nRevision: 1.2";
-        case 0x900092:
-            return "Model: Pi Zero v1.2\nRAM: 512MB\nRevision: 1.2";
-        case 0x900093:
-            return "Model: Pi Zero v1.3\nRAM: 512MB\nRevision: 1.3";
-        case 0x9000C1:
-            return "Model: Pi Zero W\nRAM: 512MB\nRevision: 1.1";
-        case 0xa02082:
-            return "Model: Pi 3 Model B (Sony UK)\nRAM: 1GB\nRevision: 1.2";
-        case 0xa22082:
-            return "Model: Pi 3 Model B (Embest)\nRAM: 1GB\nRevision: 1.2";
-        case 0xa020d3:
-            return "Model: Pi 3 Model B+ (Sony UK)\nRAM: 1GB\nRevision: 1.3";
-        case 0xa03111:
-            return "Model: Pi 4 1GB v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
-        case 0xb03111:
-            return "Model: Pi 4 2GB v1.1 (Sony UK)\nRAM: 2GB\nRevision: 1.1";
-        case 0xb03112:
-            return "Model: Pi 4 2GB v1.2 (Sony UK)\nRAM: 2GB\nRevision: 1.2";
-        case 0xb03114:
-            return "Model: Pi 4 2GB v1.4 (Sony UK)\nRAM: 2GB\nRevision: 1.4";
-        case 0xc03111:
-            return "Model: Pi 4 4GB v1.1 (Sony UK)\nRAM: 4GB\nRevision: 1.1";
-        case 0xc03112:
-            return "Model: Pi 4 4GB v1.2 (Sony UK)\nRAM: 4GB\nRevision: 1.2";
-        case 0xc03114:
-            return "Model: Pi 4 4GB v1.4 (Sony UK)\nRAM: 4GB\nRevision: 1.4";
-        case 0xd03114:
-            return "Model: Pi 4 8GB v1.4 (Sony UK)\nRAM: 8GB\nRevision: 1.4";
-        case 0xc03130:
-            return "Model: Pi 400 4GB v1.0\nRAM: 4GB\nRevision: 1.0";
-        case 0x902120:
-            return "Model: Pi Zero 2 W 1GB v1.0\nRAM: 1GB\nRevision: 1.0";
-        default:
-            return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
+        case 0x900032:return "Model: Model B+\nRAM: 512MB\nRevision: none";
+        case 0x0011:return "Model: Compute Module\nRAM: 512MB\nRevision: none";
+        case 0x0014:return "Model: Compute Module (Embest)\nRAM: 512MB\nRevision: none";
+        case 0x0012:return "Model: Model A+\nRAM: 256MB\nRevision: none";
+        case 0x0015:return "Model: Model A+ (Embest)\nRAM: 256MB or 512MB\nRevision: none";
+        case 0xa01041:return "Model: Pi 2 Model B v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
+        case 0xa21041:return "Model: Pi 2 Model B v1.1 (Embest)\nRAM: 1GB\nRevision: 1.1";
+        case 0xa22042:return "Model: Pi 2 Model B v1.2\nRAM: 1GB\nRevision: 1.2";
+        case 0x900092:return "Model: Pi Zero v1.2\nRAM: 512MB\nRevision: 1.2";
+        case 0x900093:return "Model: Pi Zero v1.3\nRAM: 512MB\nRevision: 1.3";
+        case 0x9000C1:return "Model: Pi Zero W\nRAM: 512MB\nRevision: 1.1";
+        case 0xa02082:return "Model: Pi 3 Model B (Sony UK)\nRAM: 1GB\nRevision: 1.2";
+        case 0xa22082:return "Model: Pi 3 Model B (Embest)\nRAM: 1GB\nRevision: 1.2";
+        case 0xa020d3:return "Model: Pi 3 Model B+ (Sony UK)\nRAM: 1GB\nRevision: 1.3";
+        case 0xa03111:return "Model: Pi 4 1GB v1.1 (Sony UK)\nRAM: 1GB\nRevision: 1.1";
+        case 0xb03111:return "Model: Pi 4 2GB v1.1 (Sony UK)\nRAM: 2GB\nRevision: 1.1";
+        case 0xb03112:return "Model: Pi 4 2GB v1.2 (Sony UK)\nRAM: 2GB\nRevision: 1.2";
+        case 0xb03114:return "Model: Pi 4 2GB v1.4 (Sony UK)\nRAM: 2GB\nRevision: 1.4";
+        case 0xc03111:return "Model: Pi 4 4GB v1.1 (Sony UK)\nRAM: 4GB\nRevision: 1.1";
+        case 0xc03112:return "Model: Pi 4 4GB v1.2 (Sony UK)\nRAM: 4GB\nRevision: 1.2";
+        case 0xc03114:return "Model: Pi 4 4GB v1.4 (Sony UK)\nRAM: 4GB\nRevision: 1.4";
+        case 0xd03114:return "Model: Pi 4 8GB v1.4 (Sony UK)\nRAM: 8GB\nRevision: 1.4";
+        case 0xc03130:return "Model: Pi 400 4GB v1.0\nRAM: 4GB\nRevision: 1.0";
+        case 0x902120:return "Model: Pi Zero 2 W 1GB v1.0\nRAM: 1GB\nRevision: 1.0";
+        default:return "Model: Unknown\nRAM: Unknown\nRevision: Unknown";
     }
 }
 
@@ -414,6 +311,6 @@ void videoDisplay(char *arg) {
     uart_puts("\n");
 }
 
-void game(){
+void game() {
     gameMenu();
 }

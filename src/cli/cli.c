@@ -7,20 +7,20 @@
 #define myOs "FixingGoodOS>"
 #define MAX_HISTORY 10
 
-// Static varriable to keep track of the command buffer
+// Static variable to keep track of the command buffer
 static char commandBuffer[MAX_COMMAND_SIZE];
 static int cbIndex = 0;  // pointer of command buffer
 
-// Tab function varriable
+// Tab function variable
 static char *commands[] = {
-    "help", "clear", "showinfo", "baudRate", "handShake", "teamDisplay", "videoDisplay", "game"};
+        "help", "clear", "showinfo", "baudRate", "handShake", "teamDisplay", "videoDisplay", "game"};
 static int NUM_COMMANDS = (sizeof(commands) / sizeof(commands[0]));
-static char *matched = 0;     // place holder for the matched checking
+static char *matched = 0;     // placeholder for the matched checking
 static int matchedFound = 0;  // Flag to check if matched found
 
 static uint8_t escape_seq = 0;
 
-// History varriable
+// History variable
 static char history[MAX_HISTORY][MAX_COMMAND_SIZE];
 static int historyCount = 0;
 static int historyIndex = -1;
@@ -79,32 +79,8 @@ void cli_process() {
 
     // Process the user input base on different case
     switch (c) {
+        // '-' and '=' for windows, up down for mac
         case '-':  // Go backward in history
-            if (historyIndex > 0) {
-                historyIndex--;
-                clearDisplay();
-                clearBuff(1);
-                strCopy(commandBuffer, history[historyIndex]);
-                cbIndex = strLen(commandBuffer);
-                uart_puts(commandBuffer);
-            }
-            break;
-
-        case '=':  // Go forward in history
-            if (historyIndex < historyCount - 1) {
-                historyIndex++;
-                clearDisplay();
-                clearBuff(1);
-                strCopy(commandBuffer, history[historyIndex]);
-                cbIndex = strLen(commandBuffer);
-                uart_puts(commandBuffer);
-            } else {
-                // Clear input if at the end
-                clearDisplay();
-                clearBuff(1);
-            }
-            break;
-
         case KEY_ARROW_UP:  // Go back in history
             if (historyIndex > 0) {
                 historyIndex--;
@@ -115,7 +91,7 @@ void cli_process() {
                 uart_puts(commandBuffer);
             }
             break;
-
+        case '=':  // Go forward in history
         case KEY_ARROW_DOWN:  // Go forward in history
             if (historyIndex < historyCount - 1) {
                 historyIndex++;
@@ -130,16 +106,7 @@ void cli_process() {
                 clearBuff(1);
             }
             break;
-        case KEY_ARROW_LEFT:
-        case KEY_ARROW_RIGHT:
-            // Reset cursor & redraw prompt + current input
-            uart_puts("\r\033[K");
-            uart_puts(myOs);
-            uart_puts(commandBuffer);
-            break;
-
-            // User using autofill by pressing tab
-        case '\t':
+        case '\t': // User using autofill by pressing tab
             // Loop to check the matched command
             for (int i = 0; i < NUM_COMMANDS; i++) {
                 if (startsWith(commands[i], commandBuffer)) {
@@ -155,7 +122,7 @@ void cli_process() {
             // clear the buffer
             clearBuff(1);
 
-            // Promt the matched command;
+            // Prompt the matched command;
             for (int i = 0; matched[i] != '\0'; i++) {
                 commandBuffer[cbIndex++] = matched[i];
                 uart_sendc(matched[i]);
@@ -165,7 +132,7 @@ void cli_process() {
             break;
             // User press ENTER
         case '\n':
-            // Call the commands processer function
+            // Call the commands processor function
             cmdProcess(commandBuffer);
 
             if (cbIndex > 0) {
@@ -226,20 +193,14 @@ void clearBuff(int isTab) {
     }
     cbIndex = 0;
 
-    // if the function called in the tab then dont print the next os
+    // if the function called in the tab then don't print the next os
     if (isTab) return;
     uart_sendc('\n');
     uart_puts(myOs);
 }
 
-// clear all the visual inputed on the screen
+// clear all the visual input on the screen
 void clearDisplay() {
-//    for (int i = 0; i < cbIndex; i++) {
-//        uart_sendc('\b');  // move back
-//        uart_sendc(' ');   // overwrite with space
-//        uart_sendc('\b');  // move back again
-//    }
-//    uart_puts("\r");         // Go to beginning of the line
     uart_puts("\r\033[K");
     uart_puts(myOs);
 }
