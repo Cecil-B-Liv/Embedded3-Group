@@ -3,8 +3,18 @@
 #include "../drivers/framebf.h"
 #include "../assets/gameAssets.h"
 
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 768
+#define SCREEN_WIDTH    1024
+#define SCREEN_HEIGHT   768
+
+#define PLAYER_START_X  500
+#define PLAYER_START_Y  600
+#define PLAYER_WIDTH    100
+#define PLAYER_HEIGHT   100
+#define PLAYER_SPEED    10
+
+static GameObject player = {1, PLAYER_START_X, PLAYER_START_Y, PLAYER_HEIGHT , PLAYER_WIDTH, PLAYER_SPEED, 1, basketball_hoops};
+static int score = 0;
+static unsigned int *current_stage = stage1;
 
 // static gameStage = 1;
 
@@ -48,25 +58,38 @@ void gameMenu(){
 }
 
 void gameLoop(){
-    int start_x = 500;
-    int start_y = 600;
-    int player_height = 100;
-    int player_width = 100;
-
-    // Initialize the player
-    GameObject player = {1, start_x, start_y, player_height, player_width, 1, basketball_hoops};
-
-    drawGameBackGround(stage1);
+    drawGameBackGround(current_stage);
     drawObject(&player);
-
+    
     while (1){
         char c = uart_getc();
-        if (c == '\n'){
-            //drawGameBackGround(title_start);
-            eraseObject(&player, stage1);
-            return;
+        
+        switch (c){
+        case 'a':
+            moveObject(&player, -1);
+            break;
+        case 'd':
+            moveObject(&player, +1);
+            break;
+
+        default:
+            break;
         }
     }
+}
+
+void resetPlayer(){
+    player.x = PLAYER_START_X;
+    player.y = PLAYER_START_Y;
+
+    score = 0;
+    uart_puts("\n Reset Player Position and Score");
+}
+
+void changeToStage(const unsigned int* stage){
+    current_stage = stage;
+
+    resetPlayer();
 }
 
 // Function to draw the game background
@@ -79,10 +102,10 @@ void drawObject(GameObject *obj){
 }
 
 void moveObject(GameObject *obj, int direct){
-    // Earase the object function here
+    eraseObject(obj);
 
     // Validate the value
-    obj->x += direct;
+    obj->x += obj->speed * direct;
 
     if (obj->x < 0) obj->x = 0; // if touch the left boarder
     if (obj->x + obj->width > SCREEN_WIDTH) obj->x = SCREEN_WIDTH; // if touch the right  border
@@ -92,12 +115,12 @@ void moveObject(GameObject *obj, int direct){
 }
 
 // Fill the old object with the respected background area
-void eraseObject(GameObject *obj, const unsigned int *bg) {
+void eraseObject(GameObject *obj) {
     for (int i = 0; i < obj->height; i++) {
         for (int j = 0; j < obj->width; j++) {
             int x = obj->x + j;
             int y = obj->y + i;
-            unsigned int pixel = bg[(y * SCREEN_WIDTH) + x];
+            unsigned int pixel = current_stage[(y * SCREEN_WIDTH) + x];
             drawPixelARGB32(x, y, pixel);
         }
     }
