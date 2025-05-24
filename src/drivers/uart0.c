@@ -236,7 +236,7 @@ void uart_mac_formatter(unsigned int num) {
 
 char uart_get_escape_sequence() {
     static uint8_t escape_seq = 0;
-    char c = uart_getc();
+    int c = uart_getc();
 
     if (escape_seq == 0 && c == 0x1B) {
         escape_seq = 1;
@@ -253,7 +253,9 @@ char uart_get_escape_sequence() {
             case 'D':return 0x84;  // Left arrow
             default:return 0;
         }
-    } else if ((unsigned char) c == 0x00 || (unsigned char) c == 0xE0) {
+    }
+
+    if ((unsigned char) c == 0x00 || (unsigned char) c == 0xE0) {
         escape_seq = 0;
         switch (c) {
             case 0x48: return 0x81; // Up arrow
