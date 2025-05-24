@@ -108,7 +108,7 @@ void moveObject(GameObject *obj, int direct){
     obj->x += obj->speed * direct;
 
     if (obj->x < 0) obj->x = 0; // if touch the left boarder
-    if (obj->x + obj->width > SCREEN_WIDTH) obj->x = SCREEN_WIDTH; // if touch the right  border
+    if (obj->x + obj->width > SCREEN_WIDTH) obj->x = SCREEN_WIDTH - obj->width; // if touch the right  border
 
     // Redraw new object
     drawObject(obj);
