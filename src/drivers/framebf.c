@@ -209,7 +209,7 @@ void drawBackground(unsigned int color) {
 }
 
 // Draw img to test
-void drawImg(const unsigned int pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height) {
+void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height) {
     for (int i = 0; i <= pic_width * pic_height; i++) {
         int x = pos_x + (i % pic_width);
         int y = pos_y + (i / pic_width);
@@ -222,6 +222,6 @@ void drawImg(const unsigned int pixel_data[], int pos_y, int pos_x, int pic_widt
 
 void clearScreen() {
     for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        drawPixelARGB32(i%WIDTH, i/WIDTH, 0x00000000);
+        drawPixelARGB32(i % WIDTH, i / WIDTH, 0x00000000);
     }
 }
