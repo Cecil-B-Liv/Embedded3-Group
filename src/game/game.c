@@ -36,11 +36,11 @@
 #define STAGE2_SCORE    60
 #define STAGE3_SCORE    60
 
-static GameObject player = {.type = PLAYER_TAG,
-                            .x = PLAYER_START_X, 
-                            .y = PLAYER_START_Y, 
-                            .height = PLAYER_HEIGHT, 
-                            .width = PLAYER_WIDTH, 
+static volatile GameObject player = { .type = PLAYER_TAG,
+                            .x = PLAYER_START_X,
+                            .y = PLAYER_START_Y,
+                            .height = PLAYER_HEIGHT,
+                            .width = PLAYER_WIDTH,
                             .speed = PLAYER_SPEED,
                             .alive = 1,
                             .sprite = basketball_hoops
@@ -50,24 +50,23 @@ static int win = 0;
 
 static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
-static const unsigned int *current_stage = stage1;
+static const unsigned int* current_stage = stage1;
 
 static GameObject balls[MAX_BALLS];
-
 // static gameStage = 1;
 
-void gameMenu(){
+void gameMenu() {
     drawGameBackGround(title_start);
     int isStart = 1;
 
     uart_puts("\n Enter Game Menu");
     // Loop for main game menu
-    while (1){
+    while (1) {
         // Get user input
         char c = uart_getc();
 
         // Direction arrow will be replace by awsd button instead
-        switch (c){
+        switch (c) {
         case 'w':
             isStart = 1;
             drawGameBackGround(title_start);
@@ -78,12 +77,13 @@ void gameMenu(){
             drawGameBackGround(title_exit);
             break;
         case '\n':
-            if (isStart){
+            if (isStart) {
                 uart_puts("\nGame enter");
                 clearScreen();
                 gameLoop();
-                
-            } else {
+
+            }
+            else {
                 uart_puts("\nGame exist");
                 clearScreen();
                 return;
@@ -93,16 +93,18 @@ void gameMenu(){
             break;
         }
     }
-    
+
 }
 
-void gameLoop(){
+void gameLoop() {
     drawGameBackGround(current_stage);
     drawObject(&player);
-    
+
     int frameCount = 0;
-    while (1){
-        if (win){
+    uart_puts("\n[DEBUG] &player = ");
+    uart_hex((unsigned int)&player);
+    while (1) {
+        if (win) {
             uart_puts("\nYou win! Returning to menu...\n");
             clearScreen();
             win = 0;
@@ -121,15 +123,15 @@ void gameLoop(){
         checkStageProgression();
 
         // spawn object every 60 frames
-        if (frameCount % 60 == 0) { 
+        if (frameCount % 60 == 0) {
             spawnBall();
             frameCount = 0;
         }
-        
-        if (uart_is_read_ready()){
+
+        if (uart_is_read_ready()) {
             char c = uart_getc();
-        
-            switch (c){
+
+            switch (c) {
             case 'a':
                 moveObject(&player, -1, 0);
                 break;
@@ -141,7 +143,7 @@ void gameLoop(){
                 break;
             }
         }
-        
+
         // Update frame count and wait
         frameCount++;
         wait_msec(33);
@@ -152,17 +154,19 @@ int getRandomBallType(int stage) {
     int r = SYS_TIMER_CLO % 100;
 
     // Stage 1
-    if (stage == 0) { 
+    if (stage == 0) {
         if (r < 90) return NORMAL_BALL_TAG; // 90% rate
         else if (r < 99) return SPEICAL_BALL_TAG; // 10% rate
         else return NORMAL_BALL_TAG;  // <- fallback if r >= 99
-    // Stage 2
-    } else if (stage == 1) { 
+        // Stage 2
+    }
+    else if (stage == 1) {
         if (r < 70) return NORMAL_BALL_TAG; // 70% rate
         else if (r < 90) return SPEICAL_BALL_TAG; // 20% rate
         else return BOMB_TAG; // 10% rate
-    // Stage 3
-    } else { 
+        // Stage 3
+    }
+    else {
         if (r < 60) return NORMAL_BALL_TAG; //60% rate
         else if (r < 80) return SPEICAL_BALL_TAG; // 20% rate
         else return BOMB_TAG; // 20% rate
@@ -178,17 +182,19 @@ void checkStageProgression() {
         changeToStage(stages[1]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    } else if (score >= STAGE2_SCORE && current_stage_index == 1) {
+    }
+    else if (score >= STAGE2_SCORE && current_stage_index == 1) {
         current_stage_index = 2;
         changeToStage(stages[2]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    } else if (score >= STAGE3_SCORE && current_stage_index == 2) {
+    }
+    else if (score >= STAGE3_SCORE && current_stage_index == 2) {
         win = 1;
     }
 }
 
-void checkCollision(){
+void checkCollision() {
     for (int i = 0; i < MAX_BALLS; i++) {
         // only check if the ball is alive
         if (!balls[i].alive) continue;
@@ -204,17 +210,17 @@ void checkCollision(){
 
             // score checking
             // normal ball
-            if (balls[i].type == NORMAL_BALL_TAG){
+            if (balls[i].type == NORMAL_BALL_TAG) {
                 score += NORMAL_SCORE;
                 continue;
             }
             // Special ball
-            if (balls[i].type == SPEICAL_BALL_TAG){
+            if (balls[i].type == SPEICAL_BALL_TAG) {
                 score += SPECIAL_SCORE;
                 continue;
             }
             // Bomb
-            if (balls[i].type == BOMB_TAG){
+            if (balls[i].type == BOMB_TAG) {
                 score += BOMB_SCORE;
                 continue;
             }
@@ -264,7 +270,7 @@ void updateBalls() {
 
         // If ball reaches the bottom, mark as not alive and erase
         // Bottom will count as the foot of the player
-        if (balls[i].y + balls[i].height >= PLAYER_START_Y + PLAYER_HEIGHT) { 
+        if (balls[i].y + balls[i].height >= PLAYER_START_Y + PLAYER_HEIGHT) {
             balls[i].alive = 0;
             eraseObject(&balls[i]);
             continue;
@@ -275,16 +281,17 @@ void updateBalls() {
 }
 
 // Reset the player position
-void resetPlayer(){
+void resetPlayer() {
+    uart_puts("\n[DEBUG] &player = ");
+    uart_hex((unsigned int)&player);
     player.x = PLAYER_START_X;
     player.y = PLAYER_START_Y;
-
-    score = 0;
     uart_puts("\nReset Player Position and Score");
+    score = 0;
 }
 
 // change the desired stage
-void changeToStage(const unsigned int* stage){
+void changeToStage(const unsigned int* stage) {
     current_stage = stage;
     score = 0;
 
@@ -292,15 +299,15 @@ void changeToStage(const unsigned int* stage){
 }
 
 // Function to draw the game background
-void drawGameBackGround(const unsigned int* bg){
+void drawGameBackGround(const unsigned int* bg) {
     drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
-void drawObject(GameObject *obj){
+void drawObject(GameObject* obj) {
     drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height);
 }
 
-void moveObject(GameObject *obj, int dx, int dy){
+void moveObject(GameObject* obj, int dx, int dy) {
     eraseObject(obj);
     obj->x += obj->speed * dx;
     obj->y += obj->speed * dy;
@@ -315,7 +322,7 @@ void moveObject(GameObject *obj, int dx, int dy){
 
 
 // Fill the old object with the respected background area
-void eraseObject(GameObject *obj) {
+void eraseObject(GameObject* obj) {
     for (int i = 0; i < obj->height; i++) {
         for (int j = 0; j < obj->width; j++) {
             int x = obj->x + j;
