@@ -16,6 +16,12 @@ all: clean kernel8.img run
 
 ./build/%.o: ./*/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+	
+./build/%.o: ./assets/videoFrames/AK/%.c
+	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+
+./build/%.o: ./assets/videoFrames/Cow/%.c
+	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
 # Link all object files into kernel8.img
 kernel8.img: ./build/boot.o $(OFILES)
@@ -24,7 +30,7 @@ kernel8.img: ./build/boot.o $(OFILES)
 
 # Clean target 
 clean:
-	rm -f .\build\kernel8.elf .\build\*.o *.img
+	rm -f ./build/kernel8.elf ./build/*.o *.img
 
 # Run with QEMU
 run:

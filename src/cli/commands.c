@@ -9,7 +9,9 @@
 #include "../util/time.h"
 #include "../util/utilsSap.h"
 #include "../game/game.h"
-#include "../assets/videoFrames/AK/AK_part1.h"
+#include "../assets/videoFrames/AK/akvideo.h"
+#include "../assets/videoFrames/Cow/cowvideo.h"
+
 
 #define myOs "FixingGoodOS>"
 #define MAX_COMMAND_NUMBER 8
@@ -291,7 +293,7 @@ char* getBoardModel(int rev) {
 }
 
 void teamDisplay() {
-    drawImg(background, 0, 0, 1024, 768);
+    drawImg2(background, 0, 0, 1024, 768);
 
     drawString(30, 240, "\nKIM NHAT ANH         s3978831", 0x00FF0000, 3); // red
     drawString(30, 290, "\nTRAN QUANG MINH      s3988876", 0x0000FF00, 3); // green
@@ -301,23 +303,31 @@ void teamDisplay() {
 }
 
 void videoDisplay(char* arg) {
-    if (arg != 0) {
+    if (!arg || arg[0] == '\0') {
         error(arg);
+        uart_puts("\n");
         return;
     }
 
-    drawImg(AK_allArray[0], 200, 215, 600, 338);
+    if (strComp(arg, "ak")) {
+        int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
-    // for (int i = 0; i <= 24; i++) {
-    //     drawImg(AK_part1_allArray[i], 200, 215, 600, 338);
-    //     wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-    // }
+        for (int i = 0; i < size; i++) {
+            drawImg2(akvideo_allArray[i], 200, 215, 600, 338);
+            wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+        }
+        return;
+    }
+    else {
+        int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
 
-//    for (int i = 0; i <= 24; i++) {
-//        drawImg(AK_part2_allArray[i], 200, 215, 600, 338);
-//        wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
-//    }
-//    uart_puts("\n");
+        for (int i = 0; i < size; i++) {
+            drawImg2(cowvideo_allArray[i], 200, 215, 500, 300);
+            wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+        }
+    }
+    return;
+
 }
 
 void game() {
