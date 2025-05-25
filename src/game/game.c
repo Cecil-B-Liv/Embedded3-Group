@@ -8,33 +8,36 @@
 #define SYS_TIMER_CLO  (* (volatile unsigned int*)(MMIO_BASE + 0x00003004))
 
 
-#define SCREEN_WIDTH    1024
-#define SCREEN_HEIGHT   768
+#define SCREEN_WIDTH        1024
+#define SCREEN_HEIGHT       768
 
-#define PLAYER_START_X  412
-#define PLAYER_START_Y  568
-#define PLAYER_WIDTH    100
-#define PLAYER_HEIGHT   100
-#define PLAYER_SPEED    10
-#define MAX_BALLS       10
+#define PLAYER_START_X      412
+#define PLAYER_START_Y      568
+#define PLAYER_WIDTH        100
+#define PLAYER_HEIGHT       100
+#define PLAYER_SPEED        10
+#define MAX_BALLS           10
 
-#define BALL_WIDTH      50
-#define BALL_HEIGHT     50
-#define BALL_SPEED      5
-#define MAX_BALLS       10
+#define BALL_WIDTH          50
+#define BALL_HEIGHT         50
+#define BALL_SPEED          5
+#define MAX_BALLS           10
 
-#define NORMAL_SCORE    10
-#define SPECIAL_SCORE   30
-#define BOMB_SCORE     -100
+#define NORMAL_SCORE        10
+#define SPECIAL_SCORE       30
+#define BOMB_SCORE         -100
+#define BASE_MULTIPLIER     1
 
-#define PLAYER_TAG        1
-#define NORMAL_BALL_TAG   2
-#define SPEICAL_BALL_TAG  3
-#define BOMB_TAG          4
+#define PLAYER_TAG          1
+#define NORMAL_BALL_TAG     2
+#define SPEICAL_BALL_TAG    3
+#define BOMB_TAG            4
+#define ENLARGE_TAG         5
+#define SCORE_MULTIPLY_TAG  6
 
-#define STAGE1_SCORE    60
-#define STAGE2_SCORE    60
-#define STAGE3_SCORE    60
+#define STAGE1_SCORE        60
+#define STAGE2_SCORE        60
+#define STAGE3_SCORE        60
 
 static volatile GameObject player = { .type = PLAYER_TAG,
                             .x = PLAYER_START_X,

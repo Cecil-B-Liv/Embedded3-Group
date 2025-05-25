@@ -1,4 +1,4 @@
-CFILES := $(shell find . -name "*.c")
+CFILES := $(wildcard */*.c)
 OFILES := $(addprefix build/, $(notdir $(CFILES:.c=.o)))
 
 $(info CFILES: $(CFILES))
@@ -16,12 +16,6 @@ all: clean kernel8.img run
 
 ./build/%.o: ./*/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
-	
-./build/%.o: ./assets/videoFrames/AK/%.c
-	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
-
-./build/%.o: ./assets/videoFrames/Cow/%.c
-	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
 # Link all object files into kernel8.img
 kernel8.img: ./build/boot.o $(OFILES)
@@ -30,8 +24,9 @@ kernel8.img: ./build/boot.o $(OFILES)
 
 # Clean target 
 clean:
-	rm -f ./build/kernel8.elf ./build/*.o *.img
+	del .\build\kernel8.elf .\build\*.o *.img
+# rm -f .\build\kernel8.elf .\build\*.o *.img
 
 # Run with QEMU
 run:
-	qemu-system-aarch64 -M raspi3b -kernel kernel8.img -serial stdio
+	qemu-system-aarch64 -M raspi3 -kernel kernel8.img -serial stdio

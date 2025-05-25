@@ -3,6 +3,7 @@
     "fontsap.h": "c",
     "framebf.h": "c",
     "uart0.h": "c",
-    "gpio.h": "c"
+    "gpio.h": "c",
+    "bomb.h": "c"
   }
 }

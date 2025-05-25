@@ -8,3 +8,5 @@
 #include "./gameObjects/normal_ball.h"
 #include "./gameObjects/special_ball.h"
 #include "./gameObjects/bomb.h"
+#include "./gameObjects/enlarge_item.h"
+#include "./gameObjects/score_multiply.h"
