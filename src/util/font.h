@@ -9,5 +9,5 @@ enum {
     FONT_NUMGLYPHS = 256
 };
 
-unsigned short font[256][15];
-#endif // CUSTOM_FONT_H
+extern unsigned short font[256][15];
+#endif  // CUSTOM_FONT_H
