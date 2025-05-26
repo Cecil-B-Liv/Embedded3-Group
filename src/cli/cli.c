@@ -1,6 +1,6 @@
 #include "cli.h"
 #include "../drivers/uart0.h"
-#include "../util/stringUtil.h"
+#include "../util/utils.h"
 #include "commands.h"
 
 #define MAX_COMMAND_SIZE 100
