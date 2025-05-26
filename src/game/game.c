@@ -2,7 +2,7 @@
 #include "../drivers/uart0.h"
 #include "../drivers/framebf.h"
 #include "../assets/gameAssets.h"
-#include "../util/utilsSap.h"
+#include "../util/utils.h"
 
 //System Timer Counter Lower 32 bits
 #define SYS_TIMER_CLO  (* (volatile unsigned int*)(MMIO_BASE + 0x00003004))
@@ -46,22 +46,22 @@
 #define BASE_SCORE_MULTIPLIER  1
 #define B
 
-static volatile GameObject player = { .type = PLAYER_TAG,
-                            .x = PLAYER_START_X,
-                            .y = PLAYER_START_Y,
-                            .height = PLAYER_HEIGHT,
-                            .width = PLAYER_WIDTH,
-                            .speed = PLAYER_SPEED,
-                            .alive = 1,
-                            .sprite = basketball_hoops
+static volatile GameObject player = {.type = PLAYER_TAG,
+        .x = PLAYER_START_X,
+        .y = PLAYER_START_Y,
+        .height = PLAYER_HEIGHT,
+        .width = PLAYER_WIDTH,
+        .speed = PLAYER_SPEED,
+        .alive = 1,
+        .sprite = basketball_hoops
 };
 
 static int score = 0;
 static int end = 0;
 
 static int current_stage_index = 0;
-const unsigned long* stages[] = { stage1, stage2, stage3 };
-static const unsigned long* current_stage = stage1;
+const unsigned long *stages[] = {stage1, stage2, stage3};
+static const unsigned long *current_stage = stage1;
 
 static volatile GameObject objects[MAX_OBJECTS];
 // static gameStage = 1;
@@ -78,30 +78,26 @@ void gameMenu() {
 
         // Direction arrow will be replace by awsd button instead
         switch (c) {
-        case 'w':
-            isStart = 1;
-            drawGameBackGround(title_start);
-            // show the play game screen
-            break;
-        case 's':
-            isStart = 0;
-            drawGameBackGround(title_exit);
-            break;
-        case '\n':
-            if (isStart) {
-                uart_puts("\nGame enter");
-                clearScreen();
-                gameLoop();
+            case 'w':isStart = 1;
+                drawGameBackGround(title_start);
+                // show the play game screen
+                break;
+            case 's':isStart = 0;
+                drawGameBackGround(title_exit);
+                break;
+            case '\n':
+                if (isStart) {
+                    uart_puts("\nGame enter");
+                    clearScreen();
+                    gameLoop();
 
-            }
-            else {
-                uart_puts("\nGame exist");
-                clearScreen();
-                return;
-            }
-            break;
-        default:
-            break;
+                } else {
+                    uart_puts("\nGame exist");
+                    clearScreen();
+                    return;
+                }
+                break;
+            default:break;
         }
     }
 
@@ -153,15 +149,12 @@ void gameLoop() {
             char c = uart_getc();
 
             switch (c) {
-            case 'a':
-                moveObject(&player, -1, 0);
-                break;
-            case 'd':
-                moveObject(&player, +1, 0);
-                break;
+                case 'a':moveObject(&player, -1, 0);
+                    break;
+                case 'd':moveObject(&player, +1, 0);
+                    break;
 
-            default:
-                break;
+                default:break;
             }
         }
 
@@ -179,14 +172,12 @@ int getRandomBallType(int stage) {
         else if (r < 99) return SPEICAL_BALL_TAG; // 10% rate
         else return NORMAL_BALL_TAG;  // <- fallback if r >= 99
         // Stage 2
-    }
-    else if (stage == 1) {
+    } else if (stage == 1) {
         if (r < 70) return NORMAL_BALL_TAG; // 70% rate
         else if (r < 90) return SPEICAL_BALL_TAG; // 20% rate
         else return BOMB_TAG; // 10% rate
         // Stage 3
-    }
-    else {
+    } else {
         if (r < 60) return NORMAL_BALL_TAG; //60% rate
         else if (r < 80) return SPEICAL_BALL_TAG; // 20% rate
         else return BOMB_TAG; // 20% rate
@@ -215,14 +206,12 @@ void checkStageProgression() {
         changeToStage(stages[1]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    }
-    else if (score >= STAGE2_SCORE && current_stage_index == 1) {
+    } else if (score >= STAGE2_SCORE && current_stage_index == 1) {
         current_stage_index = 2;
         changeToStage(stages[2]);
         drawGameBackGround(current_stage);
         drawObject(&player);
-    }
-    else if (score >= STAGE3_SCORE && current_stage_index == 2) {
+    } else if (score >= STAGE3_SCORE && current_stage_index == 2) {
         end = 1;
         uart_puts("\nYou win! Returning to menu...\n");
     }
@@ -283,19 +272,19 @@ void spawnBall() {
             int ball_type = getRandomBallType(current_stage_index);
 
             // Get the sprite of the object
-            const unsigned long* sprite = normal_ball; // default value
+            const unsigned long *sprite = normal_ball; // default value
             if (ball_type == SPEICAL_BALL_TAG) sprite = special_ball;
             else if (ball_type == BOMB_TAG) sprite = bomb;
 
-            objects[i] = (GameObject){
-                .type = ball_type,
-                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
-                .y = 0,
-                .width = BALL_WIDTH,
-                .height = BALL_HEIGHT,
-                .speed = BALL_SPEED,
-                .alive = 1,
-                .sprite = sprite
+            objects[i] = (GameObject) {
+                    .type = ball_type,
+                    .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
+                    .y = 0,
+                    .width = BALL_WIDTH,
+                    .height = BALL_HEIGHT,
+                    .speed = BALL_SPEED,
+                    .alive = 1,
+                    .sprite = sprite
             };
             drawObject(&objects[i]);
             break;
@@ -335,13 +324,14 @@ void resetGameObjects() {
 
     // Reset game objets
     for (int i = 1; i < MAX_OBJECTS; i++) {
-        objects[i] = (GameObject){ 0 };
+        objects[i] = (GameObject) {0};
     }
 
     uart_puts("\nGame Objects Reset");
 }
+
 // change the desired stage
-void changeToStage(const unsigned long* stage) {
+void changeToStage(const unsigned long *stage) {
     current_stage = stage;
     score = 0;
 
@@ -350,15 +340,15 @@ void changeToStage(const unsigned long* stage) {
 }
 
 // Function to draw the game background
-void drawGameBackGround(const unsigned long* bg) {
+void drawGameBackGround(const unsigned long *bg) {
     drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 }
 
-void drawObject(volatile GameObject* obj) {
+void drawObject(volatile GameObject *obj) {
     drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height, 1);
 }
 
-void moveObject(volatile GameObject* obj, int dx, int dy) {
+void moveObject(volatile GameObject *obj, int dx, int dy) {
     eraseObject(obj);
     obj->x += obj->speed * dx;
     obj->y += obj->speed * dy;
@@ -373,7 +363,7 @@ void moveObject(volatile GameObject* obj, int dx, int dy) {
 
 
 // Fill the old object with the respected background area
-void eraseObject(volatile GameObject* obj) {
+void eraseObject(volatile GameObject *obj) {
     for (int i = 0; i < obj->height; i++) {
         for (int j = 0; j < obj->width; j++) {
             int x = obj->x + j;

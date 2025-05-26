@@ -1,13 +1,10 @@
 #include "commands.h"
-
 #include "../assets/testImg.h"
 #include "../assets/background.h"
 #include "../drivers/framebf.h"
 #include "../drivers/mbox.h"
 #include "../drivers/uart0.h"
-#include "../util/stringUtil.h"
-#include "../util/time.h"
-#include "../util/utilsSap.h"
+#include "../util/utils.h"
 #include "../game/game.h"
 #include "../assets/videoFrames/AK/akvideo.h"
 #include "../assets/videoFrames/Cow/cowvideo.h"
@@ -15,18 +12,20 @@
 
 #define myOs "FixingGoodOS>"
 #define MAX_COMMAND_NUMBER 8
+#define CMD_WIDTH 15  // fixed width for aligning command names
 
 static int currentbaudrate = 115200;
 
 const commandArr commands[MAX_COMMAND_NUMBER] = {
-        {"help",         "                          Show brief information of all commands",                                                                                                       help},
-        {"clear",        "                         Clear screen",                                                                                                                                  clear},
-        {"showinfo",     "                      Show board revision and board MAC address",                                                                                                        showInfo},
-        {"baudRate",     "                      Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
-        {"handShake",    "                     Allow the user to turn on/off CTS/RTS handshaking",                                                                                                 handShake},
-        {"teamDisplay",  "                   Display all team members name on the screen",                                                                                                         teamDisplay},
-        {"videoDisplay", "                  Display the video",                                                                                                                                    videoDisplay},
-        {"game",         "                          Enter the game menu",                                                                                                                         game} };
+    { "help",         "Show brief information of all commands",                                                                                                      help },
+    { "clear",        "Clear screen",                                                                                                                                clear },
+    { "showinfo",     "Show board revision and board MAC address",                                                                                                   showInfo },
+    { "baudRate",     "Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bps",         baudRate },
+    { "handShake",    "Allow the user to turn on/off CTS/RTS handshaking",                                                                                           handShake },
+    { "teamDisplay",  "Display all team members' names on the screen",                                                                                               teamDisplay },
+    { "videoDisplay", "Display the video",                                                                                                                            videoDisplay },
+    { "game",         "Enter the game menu",                                                                                                                          game }
+};
 
 void cmdProcess(char* cmdBuff) {
     // Split the original buffer too two, cmd and argument
@@ -51,33 +50,46 @@ void cmdProcess(char* cmdBuff) {
     error(cmd);
 }
 
-// Display description for each command avaiable on the board
+
 void help(char* arg) {
-    // If help <command_name> is used
+    // If "help <command_name>" is used
     if (arg != 0) {
         for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
             if (strComp(arg, commands[i].name)) {
                 uart_puts("\n");
                 uart_puts(commands[i].name);
+                uart_puts(" - ");
                 uart_puts(commands[i].des);
+                uart_puts("\n");
                 return;
             }
         }
 
-        // if the argument is not reconigse
+        // If the argument is not recognized
         error(arg);
         return;
     }
-    uart_puts("\n\nFor more information on a specific command, type help <command-name>");
 
-    uart_puts("\n-help <command_name>           Show full information of a specific command");
+    // General help output
+    uart_puts("\n\nFor more information on a specific command, type help <command-name>\n");
+    uart_puts("Example: help baudRate\n\n");
+
     for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
-        uart_puts("\n-");
+        uart_puts("- ");
         uart_puts(commands[i].name);
-        uart_puts(commands[i].des);
-    }
 
-    uart_puts("\n");
+        // Manual spacing to align descriptions
+        int len = 0;
+        const char* cmd = commands[i].name;
+        while (cmd[len] != '\0') len++;
+
+        for (int j = len; j < CMD_WIDTH; j++) {
+            uart_sendc(' ');
+        }
+
+        uart_puts(commands[i].des);
+        uart_puts("\n");
+    }
 }
 
 void clear(char* arg) {
