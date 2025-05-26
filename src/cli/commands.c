@@ -22,11 +22,11 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
         {"help",         "                          Show brief information of all commands",                                                                                                       help},
         {"clear",        "                         Clear screen",                                                                                                                                  clear},
         {"showinfo",     "                      Show board revision and board MAC address",                                                                                                        showInfo},
-        {"baudRate",     "                       Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
+        {"baudRate",     "                      Allow the user to change the baudRate of current UART being used, include but not limited to: 9600, 19200, 38400, 57600, 115200 bits per second", baudRate},
         {"handShake",    "                     Allow the user to turn on/off CTS/RTS handshaking",                                                                                                 handShake},
         {"teamDisplay",  "                   Display all team members name on the screen",                                                                                                         teamDisplay},
         {"videoDisplay", "                  Display the video",                                                                                                                                    videoDisplay},
-        {"game",         "                           Enter the game menu",                                                                                                                         game} };
+        {"game",         "                          Enter the game menu",                                                                                                                         game} };
 
 void cmdProcess(char* cmdBuff) {
     // Split the original buffer too two, cmd and argument

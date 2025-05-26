@@ -12,8 +12,8 @@
 - [x] `help` – list and explain commands  
 - [x] `clear` – clear/scroll the screen  
 - [x] `showinfo` – show board revision + MAC address  
-- [] `baudrate` – allow changing UART baud rate  
-- [] `handshake` – enable/disable UART CTS/RTS  
+- [x] `baudrate` – allow changing UART baud rate  
+- [x] `handshake` – enable/disable UART CTS/RTS  
 
 ## 2. Image, Video, and Text Display (~20%)
 - [x] Display all team member names with background image  
@@ -23,12 +23,12 @@
 - [x] Create bitmap font data for character rendering  
 
 ## 3. Game Application for Bare Metal OS (~50%)
-- [] Design and implement a small game with graphics and colors  
-- [] Implement at least one fixed game stage (preferably more)  
-- [] Enable CLI-terminal control input (ACK/NAK feedback)  
+- [x] Design and implement a small game with graphics and colors  
+- [x] Implement at least one fixed game stage (preferably more)  
+- [x] Enable CLI-terminal control input (ACK/NAK feedback)  
 - [] Implement data logging (e.g., command count, state info)  
 - [] Ensure user-friendly gameplay with effective UI  
-- [] Test the game on both QEMU and real hardware  
+- [x] Test the game on both QEMU and real hardware  
 
 ## 4. Report and Presentation
 - [] Write a complete report with background, results, screenshots  

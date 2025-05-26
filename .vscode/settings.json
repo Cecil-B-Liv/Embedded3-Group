@@ -4,6 +4,7 @@
     "framebf.h": "c",
     "uart0.h": "c",
     "gpio.h": "c",
-    "bomb.h": "c"
+    "bomb.h": "c",
+    "minecraft_font_256_corrected_reversed_inner.h": "c"
   }
 }
