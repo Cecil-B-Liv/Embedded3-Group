@@ -39,6 +39,10 @@
 #define STAGE2_SCORE        60
 #define STAGE3_SCORE        60
 
+#define STAGE1_TIME         30
+#define STAGE2_TIME         40
+#define STAGE3_TIME         60
+
 // static volatile GameObject player = { .type = PLAYER_TAG,
 //                             .x = PLAYER_START_X,
 //                             .y = PLAYER_START_Y,
@@ -49,7 +53,7 @@
 //                             .sprite = basketball_hoops
 // };
 static int score = 0;
-static int win = 0;
+static int end = 0;
 
 static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
@@ -116,28 +120,40 @@ void gameLoop() {
     drawGameBackGround(current_stage);
     drawObject(player);
 
-    int frameCount = 0;
+    int frameCount = 0; // frames
+    int timerCount = 0; // second
     while (1) {
-        if (win) {
-            uart_puts("\nYou win! Returning to menu...\n");
-            clearScreen();
-            win = 0;
+        if (end) {
+            score = 0; // reset the score
+            end = 0;   // reset the game end flag
             current_stage_index = 0;
-            changeToStage(stages[0]);
-            drawGameBackGround(title_start);
+            resetGameObjects(); 
+            changeToStage(stages[0]); // change to the first stage again
+            drawGameBackGround(title_start); // main menu
             return;
         }
         // Move the balls
         updateBalls();
         checkCollision();
 
-        // Check the Score
-        uart_puts("\nScore: ");
-        uart_dec(score);
         checkStageProgression();
 
-        // spawn object every 60 frames
-        if (frameCount % 60 == 0) {
+        // timer
+        if (frameCount % 30 == 0){
+            uart_puts("\nCurrent time eslap: ");
+            uart_dec(timerCount);
+            timerCount++;
+        }
+
+        // Time limit reach then end game
+        if (checkTimeLimit(timerCount)){
+            uart_puts("\nTime limit reach, game lose");
+            end = 1;
+            continue;
+        }
+
+        // spawn object every 60 frames (2s)
+        if (frameCount == 60) {
             spawnBall();
             frameCount = 0;
         }
@@ -165,8 +181,7 @@ void gameLoop() {
 }
 
 int getRandomBallType(int stage) {
-    int r = SYS_TIMER_CLO % 100;
-
+    int r = (SYS_TIMER_CLO + score) % 100;
     // Stage 1
     if (stage == 0) {
         if (r < 90) return NORMAL_BALL_TAG; // 90% rate
@@ -190,7 +205,20 @@ int getRandomBallType(int stage) {
     return 0;
 }
 
+int checkTimeLimit(int timeCount) {
+    if (current_stage_index == 0 && timeCount >= STAGE1_TIME) return 1;
+    if (current_stage_index == 1 && timeCount >= STAGE2_TIME) return 1;
+    if (current_stage_index == 2 && timeCount >= STAGE3_TIME) return 1;
+    return 0;
+}
+
 void checkStageProgression() {
+    if (score <= -100){
+        end = 1;
+        uart_puts("\nNegative score threedhold reach, lose game");
+        return;
+    }
+
     if (score >= STAGE1_SCORE && current_stage_index == 0) {
         current_stage_index = 1;
         changeToStage(stages[1]);
@@ -204,11 +232,15 @@ void checkStageProgression() {
         drawObject(player);
     }
     else if (score >= STAGE3_SCORE && current_stage_index == 2) {
-        win = 1;
+        end = 1;
+        uart_puts("\nYou win! Returning to menu...\n");
     }
 }
 
 void checkCollision() {
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
+    int previousScore = score; 
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     for (int i = 1; i < MAX_BALLS; i++) {
         // only check if the ball is alive
         if (!objects[i].alive) continue;
@@ -221,7 +253,7 @@ void checkCollision() {
 
             objects[i].alive = 0;           // mark as caught
             eraseObject(&objects[i]);      // visually remove
-
+        
             // score checking
             // normal ball
             if (objects[i].type == NORMAL_BALL_TAG) {
@@ -240,6 +272,13 @@ void checkCollision() {
             }
         }
     }
+            
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
+    if (score != previousScore) {
+        uart_puts("\nScore: ");
+        uart_dec(score);
+    }
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
 }
 
 // spawn the ball from the array
@@ -259,7 +298,7 @@ void spawnBall() {
 
             objects[i] = (GameObject){
                 .type = ball_type,
-                .x = SYS_TIMER_CLO % (SCREEN_WIDTH - BALL_WIDTH), // use system counter as random seed
+                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
                 .y = 0,
                 .width = BALL_WIDTH,
                 .height = BALL_HEIGHT,
@@ -294,20 +333,29 @@ void updateBalls() {
     }
 }
 
-// Reset the player position
-void resetPlayer() {
+// Reset all game object
+void resetGameObjects(){
+    
+    // Reset Player
     player->x = PLAYER_START_X;
     player->y = PLAYER_START_Y;
     uart_puts("\nReset Player Position and Score");
     score = 0;
-}
 
+    // Reset game objets
+    for (int i = 1; i < MAX_OBJECTS; i++){
+        objects[i] = (GameObject){0};
+    }
+
+    uart_puts("\nGame Objects Reset");
+}
 // change the desired stage
 void changeToStage(const unsigned int* stage) {
     current_stage = stage;
     score = 0;
 
-    resetPlayer();
+    // reset player and all game objects
+    resetGameObjects();
 }
 
 // Function to draw the game background
