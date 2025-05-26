@@ -50,7 +50,6 @@
 // };
 static int score = 0;
 static int end = 0;
-static int timerCount = 0; // second
 
 static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
@@ -117,7 +116,8 @@ void gameLoop() {
     drawGameBackGround(current_stage);
     drawObject(player);
 
-    int frameCount = 0;
+    int frameCount = 0; // frames
+    int timerCount = 0; // second
     while (1) {
         if (end) {
             score = 0; // rest the score
@@ -139,7 +139,7 @@ void gameLoop() {
             uart_dec(timerCount);
             timerCount++;
         }
-        // spawn object every 60 frames
+        // spawn object every 60 frames (2s)
         if (frameCount == 60) {
             spawnBall();
             frameCount = 0;
