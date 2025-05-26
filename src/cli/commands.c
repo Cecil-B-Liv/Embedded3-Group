@@ -12,7 +12,7 @@
 
 #define myOs "FixingGoodOS>"
 #define MAX_COMMAND_NUMBER 8
-#define CMD_WIDTH 15  // fixed width for aligning command names
+#define CMD_WIDTH 15 // fixed width for aligning command names
 
 static int currentbaudrate = 115200;
 
@@ -29,23 +29,28 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
     {"teamDisplay", "Display all team members' names on the screen",
      teamDisplay},
     {"videoDisplay", "Display the video", videoDisplay},
-    {"game", "Enter the game menu", game} };
+    {"game", "Enter the game menu", game}};
 
-void cmdProcess(char* cmdBuff) {
+void cmdProcess(char *cmdBuff)
+{
     // Split the original buffer too two, cmd and argument
-    char* cmd = cmdBuff;
-    char* arg = 0;  // NULL pointer
-    for (int i = 0; cmd[i] != '\0'; i++) {
-        if (cmd[i] == ' ') {
+    char *cmd = cmdBuff;
+    char *arg = 0; // NULL pointer
+    for (int i = 0; cmd[i] != '\0'; i++)
+    {
+        if (cmd[i] == ' ')
+        {
             cmd[i] = '\0';
-            arg = cmdBuff + i + 1;  // start of the argument
+            arg = cmdBuff + i + 1; // start of the argument
             break;
         }
     }
 
     // Command checking
-    for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
-        if (strComp(cmdBuff, commands[i].name)) {
+    for (int i = 0; i < MAX_COMMAND_NUMBER; i++)
+    {
+        if (strComp(cmdBuff, commands[i].name))
+        {
             commands[i].cmdFunc(arg);
             return;
         }
@@ -54,11 +59,15 @@ void cmdProcess(char* cmdBuff) {
     error(cmd);
 }
 
-void help(char* arg) {
+void help(char *arg)
+{
     // If "help <command_name>" is used
-    if (arg != 0) {
-        for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
-            if (strComp(arg, commands[i].name)) {
+    if (arg != 0)
+    {
+        for (int i = 0; i < MAX_COMMAND_NUMBER; i++)
+        {
+            if (strComp(arg, commands[i].name))
+            {
                 uart_puts("\n");
                 uart_puts(commands[i].name);
                 uart_puts(" - ");
@@ -79,16 +88,19 @@ void help(char* arg) {
         "<command-name>\n");
     uart_puts("Example: help baudRate\n\n");
 
-    for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
+    for (int i = 0; i < MAX_COMMAND_NUMBER; i++)
+    {
         uart_puts("- ");
         uart_puts(commands[i].name);
 
         // Manual spacing to align descriptions
         int len = 0;
-        const char* cmd = commands[i].name;
-        while (cmd[len] != '\0') len++;
+        const char *cmd = commands[i].name;
+        while (cmd[len] != '\0')
+            len++;
 
-        for (int j = len; j < CMD_WIDTH; j++) {
+        for (int j = len; j < CMD_WIDTH; j++)
+        {
             uart_sendc(' ');
         }
 
@@ -97,8 +109,10 @@ void help(char* arg) {
     }
 }
 
-void clear(char* arg) {
-    if (arg != 0) {
+void clear(char *arg)
+{
+    if (arg != 0)
+    {
         error(arg);
         return;
     }
@@ -108,15 +122,16 @@ void clear(char* arg) {
     uart_puts("\033[H");  // Move cursor to top-left
     uart_sendc('\n');
 
-
     // Backup: scroll buffer if ANSI fails
     // for (int i = 0; i < 20; i++) {
     //     uart_sendc('\n');
     // }
 }
 
-void showInfo(char* arg) {
-    if (arg != 0) {
+void showInfo(char *arg)
+{
+    if (arg != 0)
+    {
         error(arg);
         return;
     }
@@ -127,21 +142,23 @@ void showInfo(char* arg) {
     mBuf[0] = 8 * 4;
     mBuf[1] = MBOX_REQUEST;
 
-    mBuf[2] = 0x00010002;  // Board Revision tag
+    mBuf[2] = 0x00010002; // Board Revision tag
     mBuf[3] = 4;
     mBuf[4] = 0;
     mBuf[5] = 0;
 
     mBuf[6] = MBOX_TAG_LAST;
 
-    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
+    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP))
+    {
         int rev = mBuf[5];
         uart_puts("\nBoard Revision: ");
         uart_hex(rev);
         uart_puts("\n");
         uart_puts(getBoardModel(rev));
     }
-    else {
+    else
+    {
         uart_puts("\n[ERROR] Failed to get board revision.\n");
     }
 
@@ -151,42 +168,50 @@ void showInfo(char* arg) {
     mBuf[0] = 9 * 4;
     mBuf[1] = MBOX_REQUEST;
 
-    mBuf[2] = 0x00010003;  // MAC Address tag
+    mBuf[2] = 0x00010003; // MAC Address tag
     mBuf[3] = 6;
     mBuf[4] = 0;
-    mBuf[5] = 0;  // MAC part 1
-    mBuf[6] = 0;  // MAC part 2
+    mBuf[5] = 0; // MAC part 1
+    mBuf[6] = 0; // MAC part 2
 
     mBuf[7] = MBOX_TAG_LAST;
 
-    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP)) {
-        unsigned char* mac = (unsigned char*)&mBuf[5];
+    if (mbox_call(ADDR(mBuf), MBOX_CH_PROP))
+    {
+        unsigned char *mac = (unsigned char *)&mBuf[5];
         uart_puts("\nMAC Address: ");
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++)
+        {
             uart_mac_formatter(mac[i]);
-            if (i < 5) uart_puts(":");
+            if (i < 5)
+                uart_puts(":");
         }
         uart_puts("\n");
     }
-    else {
+    else
+    {
         uart_puts("\n[ERROR] Failed to get MAC address.\n");
     }
 }
 
-void baudRate(char* arg) {
-    if (!arg || arg[0] == '\0') {
+void baudRate(char *arg)
+{
+    if (!arg || arg[0] == '\0')
+    {
         uart_puts("\n[ERROR] No baud rate specified. Usage: baudrate <baud>\n");
         return;
     }
 
-    if (!is_all_digits(arg)) {
+    if (!is_all_digits(arg))
+    {
         uart_puts("\n[ERROR] Input must be numeric only.\n");
         return;
     }
 
     int baud = my_atoi(arg);
 
-    switch (baud) {
+    switch (baud)
+    {
     case 9600:
     case 19200:
     case 38400:
@@ -197,7 +222,7 @@ void baudRate(char* arg) {
         uart_puts("Now using ");
         uart_dec(baud);
         uart_puts(" baudrate\n");
-        wait_msec(100);  // ensure no fuckery
+        wait_msec(100); // ensure no fuckery
         uart_setBaudrate(baud);
         break;
     default:
@@ -206,22 +231,27 @@ void baudRate(char* arg) {
     }
 }
 
-void handShake(char* arg) {
+void handShake(char *arg)
+{
     unsigned int handshakemode = 0;
-    if (!arg || arg[0] == '\0') {
+    if (!arg || arg[0] == '\0')
+    {
         error(arg);
         uart_puts("\n");
         return;
     }
 
-    if (strComp(arg, "On") || strComp(arg, "on")) {
+    if (strComp(arg, "On") || strComp(arg, "on"))
+    {
         handshakemode = 1;
     }
-    else if (strComp(arg, "Off") || strComp(arg, "off")) {
+    else if (strComp(arg, "Off") || strComp(arg, "off"))
+    {
         handshakemode = 0;
     }
 
-    if (handshakemode) {
+    if (handshakemode)
+    {
         wait_msec(100);
         uart_init(UART0_MODE_HANDSHAKE, currentbaudrate);
         uart_puts("\nSet Handshake On Succesfully.\n");
@@ -233,7 +263,8 @@ void handShake(char* arg) {
     return;
 }
 
-void error(char* error) {
+void error(char *error)
+{
     uart_puts("\n[ERROR] ");
     uart_sendc('"');
     uart_puts(error);
@@ -241,12 +272,15 @@ void error(char* error) {
     uart_puts(" is not recognized");
 }
 
-char* getBoardModel(int rev) {
+char *getBoardModel(int rev)
+{
     // New-style revision format (bit 23 set)
-    if ((rev & (1 << 23)) != 0) {
+    if ((rev & (1 << 23)) != 0)
+    {
         int model = (rev >> 4) & 0xFF;
 
-        switch (model) {
+        switch (model)
+        {
         case 0x00:
             return "Model: A\nRAM: 256MB\nRevision: 1.0";
         case 0x01:
@@ -291,7 +325,8 @@ char* getBoardModel(int rev) {
     }
 
     // Old-style revision format
-    switch (rev) {
+    switch (rev)
+    {
     case 0x0002:
         return "Model: Model B Rev 1\nRAM: 256MB\nRevision: none";
     case 0x0003:
@@ -320,10 +355,10 @@ char* getBoardModel(int rev) {
         return "Model: Model A+\nRAM: 256MB\nRevision: none";
     case 0x0015:
         return "Model: Model A+ (Embest)\nRAM: 256MB or 512MB\nRevision: "
-            "none";
+               "none";
     case 0xa01041:
         return "Model: Pi 2 Model B v1.1 (Sony UK)\nRAM: 1GB\nRevision: "
-            "1.1";
+               "1.1";
     case 0xa21041:
         return "Model: Pi 2 Model B v1.1 (Embest)\nRAM: 1GB\nRevision: 1.1";
     case 0xa22042:
@@ -365,51 +400,81 @@ char* getBoardModel(int rev) {
     }
 }
 
-void teamDisplay() {
+void teamDisplay()
+{
     drawImg(background, 0, 0, 1024, 768, 0);
 
     drawString(30, 240, "\nKIM NHAT ANH         s3978831", 0x00FF0000,
-        3);  // red
+               3); // red
     drawString(30, 290, "\nTRAN QUANG MINH      s3988776", 0x0000FF00,
-        3);  // green
+               3); // green
     drawString(30, 340, "\nHUYNH NGOC TAI       s3978680", 0x000000FF,
-        3);  // blue
+               3); // blue
     drawString(30, 390, "\nVU THIEN MINH HAO    s3938011", 0x00FFFF00,
-        3);  // yellow
+               3); // yellow
     uart_puts("\n");
 }
 
-void videoDisplay(char* arg) {
-    if (!arg || arg[0] == '\0') {
+void videoDisplay(char *arg)
+{
+    if (!arg || arg[0] == '\0')
+    {
         error(arg);
         uart_puts("\n");
         return;
     }
     clearScreen();
 
-    // if (strComp(arg, "ak")) {
-    //     int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
+    if (strComp(arg, "ak"))
+    {
+        int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
-    //     for (int i = 0; i < size; i++) {
-    //         drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
-    //         wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
-    //     }
-    //     clearScreen();
-    //     return;
-    // } else if (strComp(arg, "cow")) {
-    //     int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
+        for (int i = 0; i < size; i++)
+        {
+            drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
+            wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+            char c = uart_getc();
+            switch (c)
+            {
+            case '\n':
+                return;
+                break;
 
-    //     for (int i = 0; i < size; i++) {
-    //         drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
-    //         wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
-    //     }
-    //     clearScreen();
-    //     return;
-    // } else {
-    //     error(arg);
-    //     uart_puts("\n");
-    //     return;
-    // }
+            default:
+                break;
+            }
+        }
+        clearScreen();
+        return;
+    }
+    else if (strComp(arg, "cow"))
+    {
+        int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
+
+        for (int i = 0; i < size; i++)
+        {
+            drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
+            wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
+            char c = uart_getc();
+            switch (c)
+            {
+            case '\n':
+                return;
+                break;
+
+            default:
+                break;
+            }
+        }
+        clearScreen();
+        return;
+    }
+    else
+    {
+        error(arg);
+        uart_puts("\n");
+        return;
+    }
 }
 
 void game() { gameMenu(); }
