@@ -49,7 +49,7 @@
 //                             .sprite = basketball_hoops
 // };
 static int score = 0;
-static int win = 0;
+static int end = 0;
 
 static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
@@ -118,13 +118,12 @@ void gameLoop() {
 
     int frameCount = 0;
     while (1) {
-        if (win) {
-            uart_puts("\nYou win! Returning to menu...\n");
-            clearScreen();
-            win = 0;
+        if (end) {
+            score = 0; // rest the score
+            end = 0;   // reset the game end flag
             current_stage_index = 0;
-            changeToStage(stages[0]);
-            drawGameBackGround(title_start);
+            changeToStage(stages[0]); // change to the first stage again
+            drawGameBackGround(title_start); // main menu
             return;
         }
         // Move the balls
@@ -165,8 +164,7 @@ void gameLoop() {
 }
 
 int getRandomBallType(int stage) {
-    int r = SYS_TIMER_CLO % 100;
-
+    int r = (SYS_TIMER_CLO + score) % 100;
     // Stage 1
     if (stage == 0) {
         if (r < 90) return NORMAL_BALL_TAG; // 90% rate
@@ -191,6 +189,12 @@ int getRandomBallType(int stage) {
 }
 
 void checkStageProgression() {
+    if (score <= -100){
+        end = 1;
+        uart_puts("\nNegative score threedhold reach, lose game");
+        return;
+    }
+
     if (score >= STAGE1_SCORE && current_stage_index == 0) {
         current_stage_index = 1;
         changeToStage(stages[1]);
@@ -204,7 +208,8 @@ void checkStageProgression() {
         drawObject(player);
     }
     else if (score >= STAGE3_SCORE && current_stage_index == 2) {
-        win = 1;
+        end = 1;
+        uart_puts("\nYou win! Returning to menu...\n");
     }
 }
 
@@ -259,7 +264,7 @@ void spawnBall() {
 
             objects[i] = (GameObject){
                 .type = ball_type,
-                .x = SYS_TIMER_CLO % (SCREEN_WIDTH - BALL_WIDTH), // use system counter as random seed
+                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
                 .y = 0,
                 .width = BALL_WIDTH,
                 .height = BALL_HEIGHT,
