@@ -4,7 +4,7 @@ typedef struct {
     int width, height;
     int speed;
     int alive;
-    const unsigned int *sprite;
+    const unsigned long *sprite;
 } GameObject;
 
 void gameLoop();
@@ -13,9 +13,9 @@ void drawObject(GameObject *obj);
 void eraseObject(GameObject *obj);
 
 void gameMenu();
-void drawGameBackGround(const unsigned int* bg);
+void drawGameBackGround(const unsigned long* bg);
 
-void changeToStage(const unsigned int* stage);
+void changeToStage(const unsigned long* stage);
 
 void spawnBall();
 void updateBalls();

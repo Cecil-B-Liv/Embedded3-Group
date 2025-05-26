@@ -8,40 +8,43 @@
 #define SYS_TIMER_CLO  (* (volatile unsigned int*)(MMIO_BASE + 0x00003004))
 
 
-#define SCREEN_WIDTH        1024
-#define SCREEN_HEIGHT       768
+#define SCREEN_WIDTH           1024
+#define SCREEN_HEIGHT          768
 
-#define PLAYER_START_X      412
-#define PLAYER_START_Y      568
-#define PLAYER_WIDTH        100
-#define PLAYER_HEIGHT       100
-#define PLAYER_SPEED        10
-#define MAX_OBJECTS         21
+#define PLAYER_START_X         412
+#define PLAYER_START_Y         568
+#define PLAYER_WIDTH           100
+#define PLAYER_HEIGHT          100
+#define PLAYER_SPEED           10
+#define MAX_OBJECTS            21
 
-#define BALL_WIDTH          50
-#define BALL_HEIGHT         50
-#define BALL_SPEED          5
-#define MAX_BALLS           10
+#define BALL_WIDTH             50
+#define BALL_HEIGHT            50
+#define BALL_SPEED             5
+#define MAX_BALLS              10
 
-#define NORMAL_SCORE        10
-#define SPECIAL_SCORE       30
-#define BOMB_SCORE         -100
-#define BASE_MULTIPLIER     1
+#define NORMAL_SCORE           10
+#define SPECIAL_SCORE          30
+#define BOMB_SCORE            -100
+#define BASE_MULTIPLIER        1
 
-#define PLAYER_TAG          1
-#define NORMAL_BALL_TAG     2
-#define SPEICAL_BALL_TAG    3
-#define BOMB_TAG            4
-#define ENLARGE_TAG         5
-#define SCORE_MULTIPLY_TAG  6
+#define PLAYER_TAG             1
+#define NORMAL_BALL_TAG        2
+#define SPEICAL_BALL_TAG       3
+#define BOMB_TAG               4
+#define ENLARGE_TAG            5
+#define SCORE_MULTIPLY_TAG     6
 
-#define STAGE1_SCORE        60
-#define STAGE2_SCORE        60
-#define STAGE3_SCORE        60
+#define STAGE1_SCORE           60
+#define STAGE2_SCORE           60
+#define STAGE3_SCORE           60
 
-#define STAGE1_TIME         30
-#define STAGE2_TIME         40
-#define STAGE3_TIME         60
+#define STAGE1_TIME            30
+#define STAGE2_TIME            40
+#define STAGE3_TIME            60
+
+#define BASE_SCORE_MULTIPLIER  1
+#define B
 
 // static volatile GameObject player = { .type = PLAYER_TAG,
 //                             .x = PLAYER_START_X,
@@ -52,12 +55,13 @@
 //                             .alive = 1,
 //                             .sprite = basketball_hoops
 // };
+
 static int score = 0;
 static int end = 0;
 
 static int current_stage_index = 0;
-const unsigned int* stages[] = { stage1, stage2, stage3 };
-static const unsigned int* current_stage = stage1;
+const unsigned long* stages[] = { stage1, stage2, stage3 };
+static const unsigned long* current_stage = stage1;
 
 static GameObject objects[MAX_OBJECTS];  // player will be the index 0
 static GameObject* player = &objects[0]; // Player pointer to the correct index 0
@@ -292,7 +296,7 @@ void spawnBall() {
             int ball_type = getRandomBallType(current_stage_index);
 
             // Get the sprite of the object
-            const unsigned int* sprite = normal_ball; // default value
+            const unsigned long* sprite = normal_ball; // default value
             if (ball_type == SPEICAL_BALL_TAG) sprite = special_ball;
             else if (ball_type == BOMB_TAG) sprite = bomb;
 
@@ -350,7 +354,7 @@ void resetGameObjects(){
     uart_puts("\nGame Objects Reset");
 }
 // change the desired stage
-void changeToStage(const unsigned int* stage) {
+void changeToStage(const unsigned long* stage) {
     current_stage = stage;
     score = 0;
 
@@ -359,7 +363,7 @@ void changeToStage(const unsigned int* stage) {
 }
 
 // Function to draw the game background
-void drawGameBackGround(const unsigned int* bg) {
+void drawGameBackGround(const unsigned long* bg) {
     drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 }
 
