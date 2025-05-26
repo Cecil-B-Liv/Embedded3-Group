@@ -106,6 +106,8 @@ void clear(char* arg) {
     uart_puts("\033[3J"); // Clear scrollback buffer
     uart_puts("\033[2J"); // Clear visible screen
     uart_puts("\033[H");  // Move cursor to top-left
+    uart_sendc('\n');
+
 
     // Backup: scroll buffer if ANSI fails
     // for (int i = 0; i < 20; i++) {
