@@ -46,6 +46,9 @@
 #define BASE_SCORE_MULTIPLIER  1
 #define OBJECT_LOCATION_Y      65
 
+#define MENU_TAG_PAUSE 0
+#define MENU_TAG_LOSE  1
+
 static volatile GameObject player = {.type = PLAYER_TAG,
         .x = PLAYER_START_X,
         .y = PLAYER_START_Y,
@@ -57,7 +60,9 @@ static volatile GameObject player = {.type = PLAYER_TAG,
 };
 
 static int score = 0;
-static int end = 0;
+static int frameCount = 0; // frames
+static int timerCount = 0; // second
+static int breakGameLoop = 0;
 
 static int current_stage_index = 0;
 const unsigned long *stages[] = {stage1, stage2, stage3};
@@ -100,22 +105,21 @@ void gameMenu() {
             default:break;
         }
     }
-
 }
 
 void gameLoop() {
     drawGameBackGround(current_stage);
     drawObject(&player);
 
-    int frameCount = 0; // frames
-    int timerCount = 0; // second
     while (1) {
-        if (end) {
-            score = 0; // reset the score
-            end = 0;   // reset the game end flag
+
+        // Go back to the main menu
+        if (breakGameLoop){  
+
+            breakGameLoop = 0; // reset the flag
             current_stage_index = 0;
             resetGameObjects();
-            changeToStage(stages[0]); // change to the first stage again
+            changeToStage(stages[current_stage_index]); // change to the first stage again
             drawGameBackGround(title_start); // main menu
             return;
         }
@@ -135,8 +139,17 @@ void gameLoop() {
         // Time limit reach then end game
         if (checkTimeLimit(timerCount)) {
             uart_puts("\nTime limit reach, game lose");
-            end = 1;
-            continue;
+
+            if (inGameMenuChoice(MENU_TAG_LOSE)){
+                breakGameLoop = 1;
+                continue;
+            } else { // reset the stage
+                breakGameLoop = 0;
+                resetGameObjects();              // Reset player
+                drawGameBackGround(current_stage);
+                drawObject(&player);
+                continue; 
+            }
         }
 
         // spawn object every 60 frames (2s)
@@ -153,7 +166,21 @@ void gameLoop() {
                     break;
                 case 'd':moveObject(&player, +1, 0);
                     break;
+                case 27:
+                    if (inGameMenuChoice(MENU_TAG_PAUSE)){
+                        breakGameLoop = 1;
+                    } else {
+                        breakGameLoop = 0;
+                        drawGameBackGround(current_stage);
+                        drawObject(&player);
 
+                        for (int i = 0; i < MAX_OBJECTS; i++){
+                            if (objects[i].alive){
+                                drawObject(&objects[i]);
+                            }
+                        }
+                    }
+                    break;
                 default:break;
             }
         }
@@ -196,24 +223,36 @@ int checkTimeLimit(int timeCount) {
 
 void checkStageProgression() {
     if (score <= -100) {
-        end = 1;
         uart_puts("\nNegative score threedhold reach, lose game");
-        return;
+        if (inGameMenuChoice(MENU_TAG_LOSE)){
+            breakGameLoop = 1;
+            return;
+        } else { // Continue Play the game
+            breakGameLoop = 0;
+            resetGameObjects();              // Reset player
+            drawGameBackGround(current_stage);
+            drawObject(&player);
+        }
     }
 
     if (score >= STAGE1_SCORE && current_stage_index == 0) {
         current_stage_index = 1;
-        changeToStage(stages[1]);
+        changeToStage(stages[current_stage_index]);
         drawGameBackGround(current_stage);
         drawObject(&player);
     } else if (score >= STAGE2_SCORE && current_stage_index == 1) {
         current_stage_index = 2;
-        changeToStage(stages[2]);
+        changeToStage(stages[current_stage_index]);
         drawGameBackGround(current_stage);
         drawObject(&player);
     } else if (score >= STAGE3_SCORE && current_stage_index == 2) {
-        end = 1;
-        uart_puts("\nYou win! Returning to menu...\n");
+        breakGameLoop = 1;
+        drawGameBackGround(win_game_menu);
+        // wait for player to confirm the winning menu
+        while (1){
+            char c = uart_getc();
+            if (c == '\n') break;
+        }   
     }
 }
 
@@ -221,7 +260,7 @@ void checkCollision() {
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     int previousScore = score;
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
-    for (int i = 1; i < MAX_BALLS; i++) {
+    for (int i = 0; i < MAX_BALLS; i++) {
         // only check if the ball is alive
         if (!objects[i].alive) continue;
 
@@ -264,7 +303,7 @@ void checkCollision() {
 // spawn the ball from the array
 void spawnBall() {
     // If one avaiable ball from the array
-    for (int i = 1; i < MAX_BALLS; i++) {
+    for (int i = 0; i < MAX_BALLS; i++) {
         if (!objects[i].alive) {
             // Set up the ball
 
@@ -294,7 +333,7 @@ void spawnBall() {
 
 // Update the ball position
 void updateBalls() {
-    for (int i = 1; i < MAX_BALLS; i++) {
+    for (int i = 0; i < MAX_BALLS; i++) {
         if (!objects[i].alive) continue;
 
         // Erase before moving
@@ -320,10 +359,13 @@ void resetGameObjects() {
     player.x = PLAYER_START_X;
     player.y = PLAYER_START_Y;
     uart_puts("\nReset Player Position and Score");
+    
+    timerCount = 0;
+    frameCount = 0;
     score = 0;
 
     // Reset game objets
-    for (int i = 1; i < MAX_OBJECTS; i++) {
+    for (int i = 0; i < MAX_OBJECTS; i++) {
         objects[i] = (GameObject) {0};
     }
 
@@ -374,6 +416,41 @@ void eraseObject(volatile GameObject *obj) {
     }
 }
 
-void drawBarStatus(int currentTime, int timeLimit, int goal, int score){
-    
+// Return 0 = Continue, 1 = Exit
+int inGameMenuChoice(int menu_tag) {
+    int choice = 0; // 0 mean continue 1 mean exit
+    // Draw the initial screen
+    if (menu_tag == MENU_TAG_PAUSE) {
+        drawGameBackGround(pause_continue_menu);
+    } else if (menu_tag == MENU_TAG_LOSE) {
+        drawGameBackGround(lose_continue_menu);
+    }
+
+    while (1) {
+        char c = uart_getc();
+
+        switch (c) {
+            case 'w':
+                choice = 0;
+                if (menu_tag == MENU_TAG_PAUSE)
+                    drawGameBackGround(pause_continue_menu);
+                else
+                    drawGameBackGround(lose_continue_menu);
+                break;
+
+            case 's':
+                choice = 1;
+                if (menu_tag == MENU_TAG_PAUSE)
+                    drawGameBackGround(pause_exit_menu);
+                else
+                    drawGameBackGround(lose_exit_menu);
+                break;
+
+            case '\n':
+                return choice;
+
+            default:
+                break;
+        }
+    }
 }

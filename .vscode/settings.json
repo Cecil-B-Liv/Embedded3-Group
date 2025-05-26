@@ -8,6 +8,10 @@
     "minecraft_font_256_corrected_reversed_inner.h": "c",
     "utils.h": "c",
     "cowvideo.h": "c",
-    "akvideo.h": "c"
+    "akvideo.h": "c",
+    "type_traits": "c",
+    "special_ball.h": "c",
+    "normal_ball.h": "c",
+    "basketball_hoops.h": "c"
   }
 }

@@ -17,13 +17,13 @@ all: clean kernel8.img run
 ./build/%.o: ./*/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
-# Explicit rule for AK sources
-./build/%.o: ./assets/videoFrames/AK/%.c
-	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+# # Explicit rule for AK sources
+# ./build/%.o: ./assets/videoFrames/AK/%.c
+# 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
-# Explicit rule for Cow sources
-./build/%.o: ./assets/videoFrames/Cow/%.c
-	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+# # Explicit rule for Cow sources
+# ./build/%.o: ./assets/videoFrames/Cow/%.c
+# 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
 # Link all object files into kernel8.img
 kernel8.img: ./build/boot.o $(OFILES)

@@ -3,6 +3,11 @@
 #include "./gameFrames/stage3.h"
 #include "./gameFrames/title_exit.h"
 #include "./gameFrames/title_start.h"
+#include "./gameFrames/win_game_menu.h"
+#include "./gameFrames/pause_continue_menu.h"
+#include "./gameFrames/pause_exit_menu.h"
+#include "./gameFrames/lose_continue_menu.h"
+#include "./gameFrames/lose_exit_menu.h"
 
 #include "./gameObjects/basketball_hoops.h"
 #include "./gameObjects/normal_ball.h"
