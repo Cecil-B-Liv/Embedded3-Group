@@ -11,7 +11,7 @@ void drawLCircle(int center_x, int center_y, int radius, unsigned int attr, int 
 
 void drawBackground(unsigned int color);
 
-void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height);
+void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height, int isTrans);
 void drawImg2(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height);
 
 void clearScreen();
