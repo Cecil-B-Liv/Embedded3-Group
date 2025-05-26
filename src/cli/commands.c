@@ -387,29 +387,29 @@ void videoDisplay(char* arg) {
     }
     clearScreen();
 
-    // if (strComp(arg, "ak")) {
-    //     int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
+    if (strComp(arg, "ak")) {
+        int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
-    //     for (int i = 0; i < size; i++) {
-    //         drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
-    //         wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
-    //     }
-    //     clearScreen();
-    //     return;
-    // } else if (strComp(arg, "cow")) {
-    //     int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
+        for (int i = 0; i < size; i++) {
+            drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
+            wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
+        }
+        clearScreen();
+        return;
+    } else if (strComp(arg, "cow")) {
+        int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
 
-    //     for (int i = 0; i < size; i++) {
-    //         drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
-    //         wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
-    //     }
-    //     clearScreen();
-    //     return;
-    // } else {
-    //     error(arg);
-    //     uart_puts("\n");
-    //     return;
-    // }
+        for (int i = 0; i < size; i++) {
+            drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
+            wait_msec(100);  // 100 ms / 31 frames ≈ 32 ms per frame
+        }
+        clearScreen();
+        return;
+    } else {
+        error(arg);
+        uart_puts("\n");
+        return;
+    }
 }
 
 void game() { gameMenu(); }

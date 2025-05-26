@@ -1,30 +1,38 @@
-import re
+# Collect all character arrays into a single 2D array
+# First, determine the maximum height (number of rows) across all characters
+max_height = max(len(char["bitmap"]) for char in font_array_raw)
 
+# Prepare a list of arrays with zero padding to equal height
+char_arrays = []
+encoding_map = []
 
-def reverse_bits_10(value):
-    bits_10 = value & 0x03FF  # Only use bottom 10 bits
-    return int(f"{bits_10:010b}"[::-1], 2)
+for char in font_array_raw:
+    encoding = char["encoding"]
+    bitmap = char["bitmap"]
+    hex_values = [int(row, 16) for row in bitmap]
+    padded_values = hex_values + [0x0000] * (max_height - len(hex_values))
+    char_arrays.append(padded_values)
+    encoding_map.append(encoding)
 
-# Paths
-input_path = "/Users/milkyway/Documents/GitHub/Embedded3-Group/src/util/testFont/Minecraft_font_generated2.h"
-output_path = "/Users/milkyway/Documents/GitHub/Embedded3-Group/src/util/testFont/Minecraft_font_fix2.h"
+# Format as a single 2D array
+formatted_combined_array = [
+    f"    {{{', '.join(f'0x{val:04X}' for val in row)}}}, // U+{encoding:04X} '{chr(encoding) if 32 <= encoding <= 126 else ''}'"
+    for row, encoding in zip(char_arrays, encoding_map)
+]
 
-# Read file
-with open(input_path, "r") as f:
-    content = f.read()
+# Compose C file
+combined_c_content = f"""\
+#include <stdint.h>
 
-# Match 16-bit hex values (e.g., 0xABCD)
-hex_pattern = re.compile(r"0x([0-9A-Fa-f]{4})")
-matches = hex_pattern.findall(content)
+// Combined font data, {max_height} rows per character
+const uint16_t font_data[][{max_height}] = {{
+{chr(10).join(formatted_combined_array)}
+}};
+"""
 
-# Reverse only 10-bit portion
-inverted_words = [f"0x{reverse_bits_10(int(h, 16)):04X}" for h in matches]
+# Save to file
+combined_c_file_path = "/mnt/data/combined_font_data_10.c"
+with open(combined_c_file_path, "w") as f:
+    f.write(combined_c_content)
 
-# Replace content
-new_content = hex_pattern.sub(lambda m: inverted_words.pop(0), content)
-
-# Save result
-with open(output_path, "w") as f:
-    f.write(new_content)
-
-output_path
+combined_c_file_path

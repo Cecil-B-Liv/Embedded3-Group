@@ -88,7 +88,7 @@ void gameMenu() {
     drawGameBackGround(title_start);
     int isStart = 1;
 
-    uart_puts("\n Enter Game Menu");
+    uart_puts("\nEnter Game Menu");
     // Loop for main game menu
     while (1) {
         // Get user input
@@ -291,7 +291,7 @@ void checkStageProgression() {
         // wait for player to confirm the winning menu
         while (1){
             char c = uart_getc();
-            if (c == '\n') break;
+            if (c == 'x' && c == '\n') break;
         }   
     }
 }
