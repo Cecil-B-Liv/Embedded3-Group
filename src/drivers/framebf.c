@@ -209,11 +209,11 @@ void drawBackground(unsigned int color) {
 }
 
 // Draw img to test
-void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height) {
+void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height, int isTrans) {
     for (int i = 0; i <= pic_width * pic_height; i++) {
         int x = pos_x + (i % pic_width);
         int y = pos_y + (i / pic_width);
-        if (pixel_data[i] == 0) {
+        if (pixel_data[i] == 0 && isTrans) {
             continue; // Skip transparent pixels
         }
         drawPixelARGB32(x, y, pixel_data[i]);
