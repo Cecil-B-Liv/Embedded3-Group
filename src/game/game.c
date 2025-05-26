@@ -16,7 +16,7 @@
 #define PLAYER_WIDTH           100
 #define PLAYER_HEIGHT          100
 #define PLAYER_SPEED           10
-#define MAX_OBJECTS            21
+#define MAX_OBJECTS            20
 
 #define BALL_WIDTH             50
 #define BALL_HEIGHT            50
@@ -46,15 +46,15 @@
 #define BASE_SCORE_MULTIPLIER  1
 #define B
 
-// static volatile GameObject player = { .type = PLAYER_TAG,
-//                             .x = PLAYER_START_X,
-//                             .y = PLAYER_START_Y,
-//                             .height = PLAYER_HEIGHT,
-//                             .width = PLAYER_WIDTH,
-//                             .speed = PLAYER_SPEED,
-//                             .alive = 1,
-//                             .sprite = basketball_hoops
-// };
+static volatile GameObject player = { .type = PLAYER_TAG,
+                            .x = PLAYER_START_X,
+                            .y = PLAYER_START_Y,
+                            .height = PLAYER_HEIGHT,
+                            .width = PLAYER_WIDTH,
+                            .speed = PLAYER_SPEED,
+                            .alive = 1,
+                            .sprite = basketball_hoops
+};
 
 static int score = 0;
 static int end = 0;
@@ -63,8 +63,7 @@ static int current_stage_index = 0;
 const unsigned long* stages[] = { stage1, stage2, stage3 };
 static const unsigned long* current_stage = stage1;
 
-static GameObject objects[MAX_OBJECTS];  // player will be the index 0
-static GameObject* player = &objects[0]; // Player pointer to the correct index 0
+static GameObject objects[MAX_OBJECTS];  
 // static gameStage = 1;
 
 void gameMenu() {
@@ -109,20 +108,8 @@ void gameMenu() {
 }
 
 void gameLoop() {
-    // Initialize the player
-    *player = (GameObject){
-        .type = PLAYER_TAG,
-        .x = PLAYER_START_X,
-        .y = PLAYER_START_Y,
-        .width = PLAYER_WIDTH,
-        .height = PLAYER_HEIGHT,
-        .speed = PLAYER_SPEED,
-        .alive = 1,
-        .sprite = basketball_hoops
-    };
-
     drawGameBackGround(current_stage);
-    drawObject(player);
+    drawObject(&player);
 
     int frameCount = 0; // frames
     int timerCount = 0; // second
@@ -167,10 +154,10 @@ void gameLoop() {
 
             switch (c) {
             case 'a':
-                moveObject(player, -1, 0);
+                moveObject(&player, -1, 0);
                 break;
             case 'd':
-                moveObject(player, +1, 0);
+                moveObject(&player, +1, 0);
                 break;
 
             default:
@@ -227,13 +214,13 @@ void checkStageProgression() {
         current_stage_index = 1;
         changeToStage(stages[1]);
         drawGameBackGround(current_stage);
-        drawObject(player);
+        drawObject(&player);
     }
     else if (score >= STAGE2_SCORE && current_stage_index == 1) {
         current_stage_index = 2;
         changeToStage(stages[2]);
         drawGameBackGround(current_stage);
-        drawObject(player);
+        drawObject(&player);
     }
     else if (score >= STAGE3_SCORE && current_stage_index == 2) {
         end = 1;
@@ -250,10 +237,10 @@ void checkCollision() {
         if (!objects[i].alive) continue;
 
         // collision checking
-        if (player->x < objects[i].x + objects[i].width &&
-            player->x + player->width > objects[i].x &&
-            player->y < objects[i].y + objects[i].height &&
-            player->y + player->height > objects[i].y) {
+        if (player.x < objects[i].x + objects[i].width &&
+            player.x + player.width > objects[i].x &&
+            player.y < objects[i].y + objects[i].height &&
+            player.y + player.height > objects[i].y) {
 
             objects[i].alive = 0;           // mark as caught
             eraseObject(&objects[i]);      // visually remove
@@ -341,8 +328,8 @@ void updateBalls() {
 void resetGameObjects(){
     
     // Reset Player
-    player->x = PLAYER_START_X;
-    player->y = PLAYER_START_Y;
+    player.x = PLAYER_START_X;
+    player.y = PLAYER_START_Y;
     uart_puts("\nReset Player Position and Score");
     score = 0;
 

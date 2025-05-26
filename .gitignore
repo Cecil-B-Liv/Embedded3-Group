@@ -42,3 +42,4 @@ src/kernel8.img
 *.xml
 src/build/kernel8.elf
 ./src.zip
+
