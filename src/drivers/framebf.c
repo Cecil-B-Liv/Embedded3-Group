@@ -220,16 +220,6 @@ void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_wid
     }
 }
 
-void drawImg2(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_width, int pic_height) {
-    for (int i = 0; i <= pic_width * pic_height; i++) {
-        int x = pos_x + (i % pic_width);
-        int y = pos_y + (i / pic_width);
-        if (pixel_data[i] == 0) {
-            continue; // Skip transparent pixels
-        }
-        drawPixelARGB32(x, y, pixel_data[i]);
-    }
-}
 
 void clearScreen() {
     for (int i = 0; i < WIDTH * HEIGHT; i++) {

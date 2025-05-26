@@ -1,4 +1,4 @@
-CFILES := $(wildcard */*.c)
+CFILES := $(shell find . -name "*.c")
 OFILES := $(addprefix build/, $(notdir $(CFILES:.c=.o)))
 
 $(info CFILES: $(CFILES))
@@ -17,6 +17,14 @@ all: clean kernel8.img run
 ./build/%.o: ./*/%.c
 	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
 
+# Explicit rule for AK sources
+./build/%.o: videoFrames/AK/%.c
+	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+
+# Explicit rule for Cow sources
+./build/%.o: videoFrames/Cow/%.c
+	aarch64-none-elf-gcc $(GCCFLAGS) -c $< -o $@
+
 # Link all object files into kernel8.img
 kernel8.img: ./build/boot.o $(OFILES)
 	aarch64-none-elf-ld -nostdlib $^ -T ./kernel/link.ld -o ./build/kernel8.elf
@@ -24,8 +32,8 @@ kernel8.img: ./build/boot.o $(OFILES)
 
 # Clean target 
 clean:
-	del .\build\kernel8.elf .\build\*.o *.img
-# rm -f .\build\kernel8.elf .\build\*.o *.img
+# del .\build\kernel8.elf .\build\*.o *.img
+	rm -f ./build/kernel8.elf ./build/*.o *.img
 
 # Run with QEMU
 run:

@@ -293,7 +293,7 @@ char* getBoardModel(int rev) {
 }
 
 void teamDisplay() {
-    drawImg2(background, 0, 0, 1024, 768);
+    drawImg(background, 0, 0, 1024, 768, 0);
 
     drawString(30, 240, "\nKIM NHAT ANH         s3978831", 0x00FF0000, 3); // red
     drawString(30, 290, "\nTRAN QUANG MINH      s3988876", 0x0000FF00, 3); // green
@@ -313,7 +313,7 @@ void videoDisplay(char* arg) {
         int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
         for (int i = 0; i < size; i++) {
-            drawImg2(akvideo_allArray[i], 200, 215, 600, 338);
+            drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
             wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
         }
         return;
@@ -322,7 +322,7 @@ void videoDisplay(char* arg) {
         int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
 
         for (int i = 0; i < size; i++) {
-            drawImg2(cowvideo_allArray[i], 200, 215, 500, 300);
+            drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
             wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
         }
     }
