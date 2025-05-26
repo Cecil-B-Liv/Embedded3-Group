@@ -12,6 +12,7 @@
     "type_traits": "c",
     "special_ball.h": "c",
     "normal_ball.h": "c",
-    "basketball_hoops.h": "c"
+    "basketball_hoops.h": "c",
+    "gameassets.h": "c"
   }
 }

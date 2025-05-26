@@ -80,7 +80,7 @@ void cli_process() {
     // Process the user input base on different case
     switch (c) {
         // '-' and '=' for windows, up down for mac
-        case '-':  // Go backward in history
+        case '_':           // Go backward in history
         case KEY_ARROW_UP:  // Go back in history
             if (historyIndex > 0) {
                 historyIndex--;
@@ -91,7 +91,7 @@ void cli_process() {
                 uart_puts(commandBuffer);
             }
             break;
-        case '=':  // Go forward in history
+        case '+':             // Go forward in history
         case KEY_ARROW_DOWN:  // Go forward in history
             if (historyIndex < historyCount - 1) {
                 historyIndex++;

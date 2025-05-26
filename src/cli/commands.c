@@ -24,10 +24,12 @@ const commandArr commands[MAX_COMMAND_NUMBER] = {
      "Allow the user to change the baudRate of current UART being used, "
      "include but not limited to: 9600, 19200, 38400, 57600, 115200 bps",
      baudRate},
-    {"handShake", "Allow the user to turn on/off CTS/RTS handshaking", handShake},
-    {"teamDisplay", "Display all team members' names on the screen", teamDisplay},
+    {"handShake", "Allow the user to turn on/off CTS/RTS handshaking",
+     handShake},
+    {"teamDisplay", "Display all team members' names on the screen",
+     teamDisplay},
     {"videoDisplay", "Display the video", videoDisplay},
-    {"game", "Enter the game menu", game} };
+    {"game", "Enter the game menu", game}};
 
 void cmdProcess(char *cmdBuff) {
     // Split the original buffer too two, cmd and argument
@@ -45,10 +47,12 @@ void cmdProcess(char *cmdBuff) {
     for (int i = 0; i < MAX_COMMAND_NUMBER; i++) {
         if (strComp(cmdBuff, commands[i].name)) {
             commands[i].cmdFunc(arg);
+            uart_sendc('\n');
+
             return;
         }
     }
-
+    uart_sendc('\n');
     error(cmd);
 }
 
@@ -68,6 +72,8 @@ void help(char *arg) {
 
         // If the argument is not recognized
         error(arg);
+        uart_sendc('\n');
+
         return;
     }
 
@@ -98,6 +104,8 @@ void help(char *arg) {
 void clear(char *arg) {
     if (arg != 0) {
         error(arg);
+        uart_sendc('\n');
+
         return;
     }
 
@@ -105,7 +113,6 @@ void clear(char *arg) {
     uart_puts("\033[2J");  // Clear visible screen
     uart_puts("\033[H");   // Move cursor to top-left
     uart_sendc('\n');
-
 
     // Backup: scroll buffer if ANSI fails
     // for (int i = 0; i < 20; i++) {
@@ -116,6 +123,8 @@ void clear(char *arg) {
 void showInfo(char *arg) {
     if (arg != 0) {
         error(arg);
+        uart_sendc('\n');
+
         return;
     }
 
@@ -183,11 +192,21 @@ void baudRate(char *arg) {
     int baud = my_atoi(arg);
 
     switch (baud) {
+        case 110:
+        case 300:
+        case 600:
+        case 1200:
+        case 2400:
+        case 4800:
         case 9600:
+        case 14400:
         case 19200:
         case 38400:
         case 57600:
         case 115200:
+        case 230400:
+        case 460800:
+        case 921600:
             uart_puts("\nBaud rate set successfully.\n");
             currentbaudrate = baud;
             uart_puts("Now using ");
@@ -385,7 +404,6 @@ void videoDisplay(char *arg) {
     if (strComp(arg, "ak")) {
         int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
-
         // for (int i = 0; i < size; i++) {
         //     drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
         //     wait_msec(100);  // 1000 ms / 31 frames ≈ 32 ms per frame
@@ -406,14 +424,12 @@ void videoDisplay(char *arg) {
                     }
                 }
             }
-
         }
 
         clearScreen();
         return;
     } else if (strComp(arg, "cow")) {
         int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
-
 
         // for (int i = 0; i < size; i++) {
         //     drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
@@ -435,7 +451,6 @@ void videoDisplay(char *arg) {
                     }
                 }
             }
-
         }
         clearScreen();
         return;
