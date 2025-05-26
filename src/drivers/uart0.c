@@ -166,6 +166,13 @@ void uart_hex(unsigned int num) {
 void uart_dec(int num) {
     // A string to store the digit characters
     char str[33] = {0};
+    int isNegative = 0;
+
+    // Handle negative number
+    if (num < 0) {
+        isNegative = 1;
+        num = -num;  // Make it positive
+    }
 
     // Calculate the number of digits
     int len = 1;
@@ -175,13 +182,20 @@ void uart_dec(int num) {
         temp = temp / 10;
     }
 
+    int totalLen = len + isNegative;  // Add space for '-' if needed
+
     // Store into the string and print out
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < totalLen; i++) {
         int digit = num % 10; // get last digit
         num = num / 10;       // remove last digit from the number
-        str[len - (i + 1)] = digit + '0';
+        str[totalLen - (i + 1)] = digit + '0';
     }
-    str[len] = '\0';
+
+    if (isNegative) {
+        str[0] = '-';
+    }
+
+    str[totalLen] = '\0';
 
     uart_puts(str);
 }
