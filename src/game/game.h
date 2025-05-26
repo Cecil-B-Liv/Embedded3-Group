@@ -4,13 +4,13 @@ typedef struct {
     int width, height;
     int speed;
     int alive;
-    const unsigned long *sprite;
+    const unsigned long* sprite;
 } GameObject;
 
 void gameLoop();
-void moveObject(GameObject *obj, int dx, int dy);
-void drawObject(GameObject *obj);
-void eraseObject(GameObject *obj);
+void moveObject(volatile GameObject* obj, int dx, int dy);
+void drawObject(volatile GameObject* obj);
+void eraseObject(volatile GameObject* obj);
 
 void gameMenu();
 void drawGameBackGround(const unsigned long* bg);

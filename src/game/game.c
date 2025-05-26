@@ -63,7 +63,7 @@ static int current_stage_index = 0;
 const unsigned long* stages[] = { stage1, stage2, stage3 };
 static const unsigned long* current_stage = stage1;
 
-static GameObject objects[MAX_OBJECTS];  
+static volatile GameObject objects[MAX_OBJECTS];
 // static gameStage = 1;
 
 void gameMenu() {
@@ -118,7 +118,7 @@ void gameLoop() {
             score = 0; // reset the score
             end = 0;   // reset the game end flag
             current_stage_index = 0;
-            resetGameObjects(); 
+            resetGameObjects();
             changeToStage(stages[0]); // change to the first stage again
             drawGameBackGround(title_start); // main menu
             return;
@@ -130,14 +130,14 @@ void gameLoop() {
         checkStageProgression();
 
         // timer
-        if (frameCount % 30 == 0){
+        if (frameCount % 30 == 0) {
             uart_puts("\nCurrent time eslap: ");
             uart_dec(timerCount);
             timerCount++;
         }
 
         // Time limit reach then end game
-        if (checkTimeLimit(timerCount)){
+        if (checkTimeLimit(timerCount)) {
             uart_puts("\nTime limit reach, game lose");
             end = 1;
             continue;
@@ -204,7 +204,7 @@ int checkTimeLimit(int timeCount) {
 }
 
 void checkStageProgression() {
-    if (score <= -100){
+    if (score <= -100) {
         end = 1;
         uart_puts("\nNegative score threedhold reach, lose game");
         return;
@@ -230,7 +230,7 @@ void checkStageProgression() {
 
 void checkCollision() {
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
-    int previousScore = score; 
+    int previousScore = score;
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     for (int i = 1; i < MAX_BALLS; i++) {
         // only check if the ball is alive
@@ -244,7 +244,7 @@ void checkCollision() {
 
             objects[i].alive = 0;           // mark as caught
             eraseObject(&objects[i]);      // visually remove
-        
+
             // score checking
             // normal ball
             if (objects[i].type == NORMAL_BALL_TAG) {
@@ -263,7 +263,7 @@ void checkCollision() {
             }
         }
     }
-            
+
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     if (score != previousScore) {
         uart_puts("\nScore: ");
@@ -325,8 +325,8 @@ void updateBalls() {
 }
 
 // Reset all game object
-void resetGameObjects(){
-    
+void resetGameObjects() {
+
     // Reset Player
     player.x = PLAYER_START_X;
     player.y = PLAYER_START_Y;
@@ -334,8 +334,8 @@ void resetGameObjects(){
     score = 0;
 
     // Reset game objets
-    for (int i = 1; i < MAX_OBJECTS; i++){
-        objects[i] = (GameObject){0};
+    for (int i = 1; i < MAX_OBJECTS; i++) {
+        objects[i] = (GameObject){ 0 };
     }
 
     uart_puts("\nGame Objects Reset");
@@ -354,11 +354,11 @@ void drawGameBackGround(const unsigned long* bg) {
     drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 }
 
-void drawObject(GameObject* obj) {
+void drawObject(volatile GameObject* obj) {
     drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height, 1);
 }
 
-void moveObject(GameObject* obj, int dx, int dy) {
+void moveObject(volatile GameObject* obj, int dx, int dy) {
     eraseObject(obj);
     obj->x += obj->speed * dx;
     obj->y += obj->speed * dy;
@@ -373,7 +373,7 @@ void moveObject(GameObject* obj, int dx, int dy) {
 
 
 // Fill the old object with the respected background area
-void eraseObject(GameObject* obj) {
+void eraseObject(volatile GameObject* obj) {
     for (int i = 0; i < obj->height; i++) {
         for (int j = 0; j < obj->width; j++) {
             int x = obj->x + j;

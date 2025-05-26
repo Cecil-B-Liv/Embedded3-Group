@@ -316,19 +316,26 @@ void videoDisplay(char* arg) {
             drawImg(akvideo_allArray[i], 200, 215, 600, 338, 0);
             wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
         }
+        clearScreen();
         return;
     }
-    else {
+    else if (strComp(arg, "cow")) {
         int size = sizeof(cowvideo_allArray) / sizeof(cowvideo_allArray[0]);
 
         for (int i = 0; i < size; i++) {
             drawImg(cowvideo_allArray[i], 200, 215, 500, 300, 0);
             wait_msec(100); // 1000 ms / 31 frames ≈ 32 ms per frame
         }
+        clearScreen();
+        return;
     }
-    return;
-
+    else {
+        error(arg);
+        uart_puts("\n");
+        return;
+    }
 }
+
 
 void game() {
     gameMenu();
