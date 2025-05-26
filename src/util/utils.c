@@ -181,9 +181,42 @@ int strLen(const char *str) {
     return len;
 }
 
-// Convert two digit number to string used in the time display in game
-void itoa2(int num, char* out) {
-    out[0] = '0' + (num / 10);
-    out[1] = '0' + (num % 10);
-    out[2] = '\0';
+void intToStr(int num, char *str) {
+    int i = 0;
+    int isNegative = 0;
+
+    // Handle 0 explicitly
+    if (num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return;
+    }
+
+    // Handle negative numbers
+    if (num < 0) {
+        isNegative = 1;
+        num = -num;
+    }
+
+    // Process digits in reverse
+    while (num != 0) {
+        int digit = num % 10;
+        str[i++] = digit + '0';
+        num /= 10;
+    }
+
+    if (isNegative) {
+        str[i++] = '-';
+    }
+
+    // Terminate string
+    str[i] = '\0';
+
+    // Reverse the string
+    for (int j = 0; j < i / 2; j++) {
+        char tmp = str[j];
+        str[j] = str[i - j - 1];
+        str[i - j - 1] = tmp;
+    }
 }
+

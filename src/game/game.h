@@ -25,6 +25,9 @@ void checkCollision();
 void checkStageProgression();
 int getRandomBallType(int stage);
 
-int checkTimeLimit(int timeCount);
 void resetGameObjects();
 int inGameMenuChoice(int menu_tag);
+
+void refreshStatusBar();
+void clearStatusBar();
+void drawStatusBar();

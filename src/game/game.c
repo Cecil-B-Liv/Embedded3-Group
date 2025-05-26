@@ -49,6 +49,9 @@
 #define MENU_TAG_PAUSE 0
 #define MENU_TAG_LOSE  1
 
+#define STATUSBAR_Y_START 0
+#define STATUSBAR_HEIGHT  60
+
 static volatile GameObject player = {.type = PLAYER_TAG,
         .x = PLAYER_START_X,
         .y = PLAYER_START_Y,
@@ -61,7 +64,7 @@ static volatile GameObject player = {.type = PLAYER_TAG,
 
 static int score = 0;
 static int frameCount = 0; // frames
-static int timerCount = 0; // second
+static int timerCount = STAGE1_TIME; // second
 static int breakGameLoop = 0;
 
 static int current_stage_index = 0;
@@ -123,6 +126,8 @@ void gameLoop() {
             drawGameBackGround(title_start); // main menu
             return;
         }
+        refreshStatusBar();
+        
         // Move the balls
         updateBalls();
         checkCollision();
@@ -131,13 +136,13 @@ void gameLoop() {
 
         // timer
         if (frameCount % 30 == 0) {
-            uart_puts("\nCurrent time eslap: ");
+            uart_puts("\nTime Left: ");
             uart_dec(timerCount);
-            timerCount++;
+            timerCount--;
         }
 
         // Time limit reach then end game
-        if (checkTimeLimit(timerCount)) {
+        if (timerCount == 0) {
             uart_puts("\nTime limit reach, game lose");
 
             if (inGameMenuChoice(MENU_TAG_LOSE)){
@@ -214,13 +219,6 @@ int getRandomBallType(int stage) {
     return 0;
 }
 
-int checkTimeLimit(int timeCount) {
-    if (current_stage_index == 0 && timeCount >= STAGE1_TIME) return 1;
-    if (current_stage_index == 1 && timeCount >= STAGE2_TIME) return 1;
-    if (current_stage_index == 2 && timeCount >= STAGE3_TIME) return 1;
-    return 0;
-}
-
 void checkStageProgression() {
     if (score <= -100) {
         uart_puts("\nNegative score threedhold reach, lose game");
@@ -237,11 +235,13 @@ void checkStageProgression() {
 
     if (score >= STAGE1_SCORE && current_stage_index == 0) {
         current_stage_index = 1;
+        timerCount = STAGE2_SCORE;
         changeToStage(stages[current_stage_index]);
         drawGameBackGround(current_stage);
         drawObject(&player);
     } else if (score >= STAGE2_SCORE && current_stage_index == 1) {
         current_stage_index = 2;
+        timerCount = STAGE3_SCORE;
         changeToStage(stages[current_stage_index]);
         drawGameBackGround(current_stage);
         drawObject(&player);
@@ -360,7 +360,13 @@ void resetGameObjects() {
     player.y = PLAYER_START_Y;
     uart_puts("\nReset Player Position and Score");
     
-    timerCount = 0;
+    if (current_stage_index == 0)
+        timerCount = STAGE1_TIME;
+    else if (current_stage_index == 1)
+        timerCount = STAGE2_TIME;
+    else
+        timerCount = STAGE3_TIME;
+        
     frameCount = 0;
     score = 0;
 
@@ -453,4 +459,46 @@ int inGameMenuChoice(int menu_tag) {
                 break;
         }
     }
+}
+
+void refreshStatusBar(){
+    clearStatusBar();
+    drawStatusBar();
+}
+
+void clearStatusBar(){
+    for (int y = STATUSBAR_Y_START; y < STATUSBAR_Y_START + STATUSBAR_HEIGHT; y++) {
+        for (int x = 0; x < SCREEN_WIDTH; x++) {
+            unsigned int pixel = current_stage[(y * SCREEN_WIDTH) + x];
+            drawPixelARGB32(x, y, pixel);
+        }
+    }
+}
+
+void drawStatusBar(){
+    // String to store value
+    char timeStr[12];
+    char goalStr[12];
+    char scoreStr[12];
+
+    // convert number to string
+    intToStr(timerCount, timeStr);
+    intToStr(STAGE1_SCORE, goalStr);
+    intToStr(score, scoreStr);
+
+    if (current_stage_index == 0)
+        intToStr(STAGE1_SCORE, goalStr);
+    else if (current_stage_index == 1)
+        intToStr(STAGE2_SCORE, goalStr);
+    else
+        intToStr(STAGE3_SCORE, goalStr);
+
+    drawString(40,    5, "Time:", 0, 4);
+    drawString(200,   5, timeStr, 0, 4);
+
+    drawString(388,   5, "Goal:", 0, 4);
+    drawString(550,   5, goalStr, 0, 4);
+
+    drawString(716,   5, "Score:", 0, 4);
+    drawString(901,   5, scoreStr, 0, 4);
 }

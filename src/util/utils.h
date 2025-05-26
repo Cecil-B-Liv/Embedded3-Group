@@ -20,3 +20,5 @@ void strCopy(char *dest, const char *src);
 
 int strLen(const char *str);
 
+void intToStr(int num, char *str);
+
