@@ -181,3 +181,9 @@ int strLen(const char *str) {
     return len;
 }
 
+// Convert two digit number to string used in the time display in game
+void itoa2(int num, char* out) {
+    out[0] = '0' + (num / 10);
+    out[1] = '0' + (num % 10);
+    out[2] = '\0';
+}

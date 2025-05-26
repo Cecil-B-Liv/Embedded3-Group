@@ -13,7 +13,7 @@
 
 #define PLAYER_START_X         412
 #define PLAYER_START_Y         568
-#define PLAYER_WIDTH           100
+#define PLAYER_WIDTH           80
 #define PLAYER_HEIGHT          100
 #define PLAYER_SPEED           10
 #define MAX_OBJECTS            20
@@ -44,7 +44,7 @@
 #define STAGE3_TIME            60
 
 #define BASE_SCORE_MULTIPLIER  1
-#define B
+#define OBJECT_LOCATION_Y      65
 
 static volatile GameObject player = {.type = PLAYER_TAG,
         .x = PLAYER_START_X,
@@ -276,15 +276,15 @@ void spawnBall() {
             if (ball_type == SPEICAL_BALL_TAG) sprite = special_ball;
             else if (ball_type == BOMB_TAG) sprite = bomb;
 
-            objects[i] = (GameObject) {
-                    .type = ball_type,
-                    .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
-                    .y = 0,
-                    .width = BALL_WIDTH,
-                    .height = BALL_HEIGHT,
-                    .speed = BALL_SPEED,
-                    .alive = 1,
-                    .sprite = sprite
+            objects[i] = (GameObject){
+                .type = ball_type,
+                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH), // use system counter and score as random seed
+                .y = OBJECT_LOCATION_Y,
+                .width = BALL_WIDTH,
+                .height = (ball_type == SPEICAL_BALL_TAG) ? 80 : BALL_HEIGHT,
+                .speed = BALL_SPEED,
+                .alive = 1,
+                .sprite = sprite
             };
             drawObject(&objects[i]);
             break;
@@ -374,3 +374,6 @@ void eraseObject(volatile GameObject *obj) {
     }
 }
 
+void drawBarStatus(int currentTime, int timeLimit, int goal, int score){
+    
+}
