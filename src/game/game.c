@@ -364,11 +364,11 @@ void changeToStage(const unsigned long* stage) {
 
 // Function to draw the game background
 void drawGameBackGround(const unsigned long* bg) {
-    drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    drawImg(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 }
 
 void drawObject(GameObject* obj) {
-    drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height);
+    drawImg(obj->sprite, obj->y, obj->x, obj->width, obj->height, 1);
 }
 
 void moveObject(GameObject* obj, int dx, int dy) {
