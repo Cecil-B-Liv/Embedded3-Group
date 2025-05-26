@@ -50,6 +50,7 @@
 // };
 static int score = 0;
 static int end = 0;
+static int timerCount = 0; // second
 
 static int current_stage_index = 0;
 const unsigned int* stages[] = { stage1, stage2, stage3 };
@@ -130,13 +131,16 @@ void gameLoop() {
         updateBalls();
         checkCollision();
 
-        // Check the Score
-        uart_puts("\nScore: ");
-        uart_dec(score);
         checkStageProgression();
 
+        // timer
+        if (frameCount % 30 == 0){
+            uart_puts("\nCurrent time eslap: ");
+            uart_dec(timerCount);
+            timerCount++;
+        }
         // spawn object every 60 frames
-        if (frameCount % 60 == 0) {
+        if (frameCount == 60) {
             spawnBall();
             frameCount = 0;
         }
@@ -214,6 +218,9 @@ void checkStageProgression() {
 }
 
 void checkCollision() {
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
+    int previousScore = score; 
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     for (int i = 1; i < MAX_BALLS; i++) {
         // only check if the ball is alive
         if (!objects[i].alive) continue;
@@ -226,7 +233,7 @@ void checkCollision() {
 
             objects[i].alive = 0;           // mark as caught
             eraseObject(&objects[i]);      // visually remove
-
+        
             // score checking
             // normal ball
             if (objects[i].type == NORMAL_BALL_TAG) {
@@ -245,6 +252,13 @@ void checkCollision() {
             }
         }
     }
+            
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
+    if (score != previousScore) {
+        uart_puts("\nScore: ");
+        uart_dec(score);
+    }
+    // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
 }
 
 // spawn the ball from the array
