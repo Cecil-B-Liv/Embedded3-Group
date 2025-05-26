@@ -15,7 +15,6 @@ void eraseObject(GameObject *obj);
 void gameMenu();
 void drawGameBackGround(const unsigned int* bg);
 
-void resetPlayer();
 void changeToStage(const unsigned int* stage);
 
 void spawnBall();
@@ -25,3 +24,6 @@ void checkCollision();
 
 void checkStageProgression();
 int getRandomBallType(int stage);
+
+int checkTimeLimit(int timeCount);
+void resetGameObjects();
