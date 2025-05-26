@@ -10,6 +10,7 @@
 #include "./gameFrames/lose_exit_menu.h"
 
 #include "./gameObjects/basketball_hoops.h"
+#include "./gameObjects/basketball_hoops_large.h"
 #include "./gameObjects/normal_ball.h"
 #include "./gameObjects/special_ball.h"
 #include "./gameObjects/bomb.h"

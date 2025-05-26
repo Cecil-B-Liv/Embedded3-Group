@@ -26,7 +26,7 @@
 #define NORMAL_SCORE           10
 #define SPECIAL_SCORE          30
 #define BOMB_SCORE            -100
-#define BASE_MULTIPLIER        1
+#define SCORE_MULTIPLIER       2
 
 #define PLAYER_TAG             1
 #define NORMAL_BALL_TAG        2
@@ -34,6 +34,9 @@
 #define BOMB_TAG               4
 #define ENLARGE_TAG            5
 #define SCORE_MULTIPLY_TAG     6
+
+#define ENLARGE_TIME           10
+#define MULTIPLY_TIME          10
 
 #define STAGE1_SCORE           60
 #define STAGE2_SCORE           60
@@ -65,6 +68,13 @@ static volatile GameObject player = {.type = PLAYER_TAG,
 static int score = 0;
 static int frameCount = 0; // frames
 static int timerCount = STAGE1_TIME; // second
+
+static int x2ScoreTimeCount = 0;
+static int x2ScoreActive = 0;
+
+static int enlargeTimeCount = 0;
+static int enlargeActive = 0;
+
 static int breakGameLoop = 0;
 
 static int current_stage_index = 0;
@@ -139,6 +149,28 @@ void gameLoop() {
             uart_puts("\nTime Left: ");
             uart_dec(timerCount);
             timerCount--;
+            
+            if (x2ScoreActive){
+                x2ScoreTimeCount++;
+            }
+            if(enlargeActive){
+                enlargeTimeCount++;
+            }
+        }
+
+        if(x2ScoreTimeCount == MULTIPLY_TIME){
+            x2ScoreActive = 0;
+            x2ScoreTimeCount = 0;
+        }
+
+        if(enlargeTimeCount == ENLARGE_TIME){
+            eraseObject(&player);
+            player.sprite = basketball_hoops;
+            player.width = PLAYER_WIDTH;
+            drawObject(&player);
+
+            enlargeActive = 0;
+            enlargeTimeCount = 0;
         }
 
         // Time limit reach then end game
@@ -198,21 +230,29 @@ void gameLoop() {
 
 int getRandomBallType(int stage) {
     int r = (SYS_TIMER_CLO + score) % 100;
-    // Stage 1
     if (stage == 0) {
-        if (r < 90) return NORMAL_BALL_TAG; // 90% rate
-        else if (r < 99) return SPEICAL_BALL_TAG; // 10% rate
-        else return NORMAL_BALL_TAG;  // <- fallback if r >= 99
-        // Stage 2
+            // Stage 1 spawn rates:
+            // 85% Normal, 7% Special, 4% Enlarge, 4% x2 Score
+            if (r < 85) return NORMAL_BALL_TAG;             // 0–84 (85%)
+            else if (r < 92) return SPEICAL_BALL_TAG;       // 85–91 (7%)
+            else if (r < 96) return ENLARGE_TAG;            // 92–95 (4%)
+            else return SCORE_MULTIPLY_TAG;                 // 96–99 (4%)
     } else if (stage == 1) {
-        if (r < 70) return NORMAL_BALL_TAG; // 70% rate
-        else if (r < 90) return SPEICAL_BALL_TAG; // 20% rate
-        else return BOMB_TAG; // 10% rate
-        // Stage 3
+            // Stage 2 spawn rates:
+            // 65% Normal, 15% Special, 10% Bomb, 5% Enlarge, 5% x2 Score
+            if (r < 65) return NORMAL_BALL_TAG;             // 0–64 (65%)
+            else if (r < 80) return SPEICAL_BALL_TAG;       // 65–79 (15%)
+            else if (r < 90) return BOMB_TAG;               // 80–89 (10%)
+            else if (r < 95) return ENLARGE_TAG;            // 90–94 (5%)
+            else return SCORE_MULTIPLY_TAG;                 // 95–99 (5%)
     } else {
-        if (r < 60) return NORMAL_BALL_TAG; //60% rate
-        else if (r < 80) return SPEICAL_BALL_TAG; // 20% rate
-        else return BOMB_TAG; // 20% rate
+            // Stage 3 spawn rates:
+            // 55% Normal, 15% Special, 15% Bomb, 7% Enlarge, 8% x2 Score
+            if (r < 55) return NORMAL_BALL_TAG;             // 0–54 (55%)
+            else if (r < 70) return SPEICAL_BALL_TAG;       // 55–69 (15%)
+            else if (r < 85) return BOMB_TAG;               // 70–84 (15%)
+            else if (r < 92) return ENLARGE_TAG;            // 85–91 (7%)
+            else return SCORE_MULTIPLY_TAG;                 // 92–99 (8%)
     }
 
     // return normal ball as default
@@ -260,6 +300,7 @@ void checkCollision() {
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
     int previousScore = score;
     // TEMP VARRIABLE WILL BE REMOVE IN FINAL PRODUCT
+    int multiplier = x2ScoreActive ? 2 : 1;
     for (int i = 0; i < MAX_BALLS; i++) {
         // only check if the ball is alive
         if (!objects[i].alive) continue;
@@ -276,12 +317,12 @@ void checkCollision() {
             // score checking
             // normal ball
             if (objects[i].type == NORMAL_BALL_TAG) {
-                score += NORMAL_SCORE;
+                score += NORMAL_SCORE * multiplier;
                 continue;
             }
             // Special ball
             if (objects[i].type == SPEICAL_BALL_TAG) {
-                score += SPECIAL_SCORE;
+                score += SPECIAL_SCORE * multiplier;
                 continue;
             }
             // Bomb
@@ -289,6 +330,20 @@ void checkCollision() {
                 score += BOMB_SCORE;
                 continue;
             }
+            // enlarge
+            if (objects[i].type == ENLARGE_TAG){
+                player.sprite = basketball_hoops_large,
+                player.width  = 160;
+                eraseObject(&player);
+                drawObject(&player);
+
+                enlargeActive = 1;
+            }
+            // multipler
+            if (objects[i].type == SCORE_MULTIPLY_TAG){
+                x2ScoreActive = 1;
+            }
+
         }
     }
 
@@ -312,8 +367,10 @@ void spawnBall() {
 
             // Get the sprite of the object
             const unsigned long *sprite = normal_ball; // default value
-            if (ball_type == SPEICAL_BALL_TAG) sprite = special_ball;
-            else if (ball_type == BOMB_TAG) sprite = bomb;
+             if (ball_type == SPEICAL_BALL_TAG)       sprite = special_ball;
+            else if (ball_type == BOMB_TAG)          sprite = bomb;
+            else if (ball_type == ENLARGE_TAG)       sprite = x2_size;
+            else if (ball_type == SCORE_MULTIPLY_TAG) sprite = x2_score;
 
             objects[i] = (GameObject){
                 .type = ball_type,
@@ -366,9 +423,20 @@ void resetGameObjects() {
         timerCount = STAGE2_TIME;
     else
         timerCount = STAGE3_TIME;
-        
+
     frameCount = 0;
     score = 0;
+
+    enlargeActive = 0;
+    enlargeTimeCount = 0;
+    
+    eraseObject(&player);
+    player.sprite = basketball_hoops;
+    player.width = PLAYER_WIDTH;
+    drawObject(&player);
+
+    x2ScoreActive = 0;
+    x2ScoreTimeCount = 0;
 
     // Reset game objets
     for (int i = 0; i < MAX_OBJECTS; i++) {
