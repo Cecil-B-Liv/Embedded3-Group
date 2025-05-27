@@ -38,13 +38,13 @@
 #define ENLARGE_TIME 10
 #define MULTIPLY_TIME 10
 
-#define STAGE1_SCORE 60
-#define STAGE2_SCORE 60
-#define STAGE3_SCORE 60
+#define STAGE1_SCORE 150
+#define STAGE2_SCORE 250
+#define STAGE3_SCORE 350
 
-#define STAGE1_TIME 30
-#define STAGE2_TIME 40
-#define STAGE3_TIME 60
+#define STAGE1_TIME 60
+#define STAGE2_TIME 70
+#define STAGE3_TIME 90
 
 #define BASE_SCORE_MULTIPLIER 1
 #define OBJECT_LOCATION_Y 65
@@ -637,5 +637,6 @@ void drawStatusBar() {
     drawString(550, 5, goalStr, 0, 4);
 
     drawString(716, 5, "Score:", 0, 4);
-    drawString(901, 5, scoreStr, 0, 4);
+    // Change color if x2 is active, black is default and red is when activate
+    drawString(901, 5, scoreStr, x2ScoreActive ? 0x00FF0000 : 0x00000000, 4);
 }
