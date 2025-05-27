@@ -1,36 +1,54 @@
-# EEET2490 Group Project To-Do List
+# EEET2490 Group Project – Bare Metal Operating System
 
-## 1. Welcome Message and Command Line Interpreter (CLI) (~30%)
-- [x] Create ASCII welcome message using online tool  
-- [x] Display OS name as CLI prompt (e.g., `MyOS>`)  
-- [x] Implement command input buffer with Enter key detection  
-- [x] Support auto-completion with TAB key  
-- [x] Implement command history (UP = `_`, DOWN = `+`)  
-- [x] Allow backspace/deletion without removing OS name  
+## Project Overview
+This project is developed as part of EEET2490 – Embedded System: OS and Interfacing (Semester 2025-1). It demonstrates the creation of a bare-metal operating system for the Raspberry Pi platform, featuring a custom command-line interface (CLI), framebuffer-based multimedia display, and a mini game application.
 
-### Commands to implement
-- [x] `help` – list and explain commands  
-- [x] `clear` – clear/scroll the screen  
-- [x] `showinfo` – show board revision + MAC address  
-- [x] `baudrate` – allow changing UART baud rate  
-- [x] `handshake` – enable/disable UART CTS/RTS  
+**Main Features:**
+- ASCII welcome banner and interactive CLI (FixingGoodOS>)
+- UART-based command parsing with auto-completion and history
+- Display of background images, custom fonts, and text
+- Frame-by-frame video playback using converted BMP images
+- A basketball-themed game with player input, multiple items, and win/loss conditions
 
-## 2. Image, Video, and Text Display (~20%)
-- [x] Display all team member names with background image  
-- [x] Use custom fonts and different colors for text  
-- [x] Record and display a short video on screen  
-- [x] Convert video into frames and display sequentially  
-- [x] Create bitmap font data for character rendering  
+## Project Components
+### 1. Welcome Message & Command Line Interface (CLI)
+- Displays an ASCII boot message and custom prompt
+- Supports built-in commands:
+  - `help` – list commands or show usage
+  - `clear` – clear screen via ANSI
+  - `showinfo` – display board revision and MAC address via mailbox
+  - `baudRate` – change UART baud rate (e.g., 9600, 115200)
+  - `handShake` – toggle UART hardware handshake
+  - `teamDisplay` – show team names using framebuffer
+  - `videoDisplay <ak/cow>` – play selected video
+  - `game` – launch game loop
+- Features:
+  - Tab-based command auto-completion
+  - Command history (`_` and `+`)
+  - Backspace support without erasing CLI prefix
 
-## 3. Game Application for Bare Metal OS (~50%)
-- [x] Design and implement a small game with graphics and colors  
-- [x] Implement at least one fixed game stage (preferably more)  
-- [x] Enable CLI-terminal control input (ACK/NAK feedback)  
-- [] Implement data logging (e.g., command count, state info)  
-- [] Ensure user-friendly gameplay with effective UI  
-- [x] Test the game on both QEMU and real hardware  
+### 2. Image, Video, and Text Display
+- Team member names rendered using an 8x15 custom font (Tamzen)
+- Background images rendered via ARGB32 framebuffer
+- Video playback: Cow Dance and Gun Reload (stored as image arrays)
+- Video runs at ~10 FPS, looped until Enter is pressed
 
-## 4. Report and Presentation
-- [] Write a complete report with background, results, screenshots  
-- [] Discuss project success and limitations  
-- [] Record demo video (max 20 mins, all members present)
+### 3. Basketball Game Application
+- Player-controlled hoop using UART input ('a' and 'd')
+- Items fall from above (Normal, Special, Bomb, Enlarge, Multiply)
+- Game stages: Street → School → NBA
+- Win condition: pass all 3 stages
+- Lose condition: score < -100 or time limit exceeded
+- UART logs ACK/NAK messages, score updates
+
+## How to Build & Run
+
+### Requirements
+- `qemu-system-aarch64` (QEMU emulator)
+- `aarch64-none-elf-gcc`, `ld`, `objcopy`
+
+### Compilation Steps
+1. Open terminal and navigate to `./src`
+2. Run:
+   ```bash
+   make
