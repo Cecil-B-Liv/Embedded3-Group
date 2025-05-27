@@ -401,6 +401,8 @@ void videoDisplay(char *arg) {
     }
     clearScreen();
 
+    uart_puts("\nPress Enter to stop the loop");
+
     if (strComp(arg, "ak")) {
         int size = sizeof(akvideo_allArray) / sizeof(akvideo_allArray[0]);
 
