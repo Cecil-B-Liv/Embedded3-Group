@@ -16,7 +16,7 @@ unsigned int width, height, pitch;
 
 /* Frame buffer address
  * (declare as pointer of unsigned char to access each byte) */
-unsigned char *fb;
+unsigned char* fb;
 
 /**
  * Set screen resolution to 1024x768
@@ -73,7 +73,7 @@ void framebf_init() {
         && mBuf[28] != 0 //got a valid address for frame buffer ?
         && mBuf[5] == WIDTH
         && mBuf[6] == HEIGHT
-            ) {
+        ) {
 
         /* Convert GPU address to ARM address (clear higher address bits)
          * Frame Buffer is located in RAM memory, which VideoCore MMU
@@ -84,7 +84,7 @@ void framebf_init() {
         mBuf[28] &= 0x3FFFFFFF;
 
         // Access frame buffer as 1 byte per each address
-        fb = (unsigned char *) ((unsigned long) mBuf[28]);
+        fb = (unsigned char*)((unsigned long)mBuf[28]);
         uart_puts("Got allocated Frame Buffer at RAM physical address: ");
         uart_hex(mBuf[28]);
         uart_puts("\n");
@@ -97,7 +97,8 @@ void framebf_init() {
         height = mBuf[6];        // Actual physical height
         pitch = mBuf[33];       // Number of bytes per line
 
-    } else {
+    }
+    else {
         uart_puts("Unable to get a frame buffer with provided setting\n");
     }
 }
@@ -106,15 +107,15 @@ void framebf_init() {
 void drawPixelARGB32(int x, int y, unsigned int attr) {
     int offs = (y * pitch) + (COLOR_DEPTH / 8 * x);
 
-/*	//Access and assign each byte
-    *(fb + offs    ) = (attr >> 0 ) & 0xFF; //BLUE  (get the least significant byte)
-    *(fb + offs + 1) = (attr >> 8 ) & 0xFF; //GREEN
-    *(fb + offs + 2) = (attr >> 16) & 0xFF; //RED
-    *(fb + offs + 3) = (attr >> 24) & 0xFF; //ALPHA
-*/
+    /*	//Access and assign each byte
+        *(fb + offs    ) = (attr >> 0 ) & 0xFF; //BLUE  (get the least significant byte)
+        *(fb + offs + 1) = (attr >> 8 ) & 0xFF; //GREEN
+        *(fb + offs + 2) = (attr >> 16) & 0xFF; //RED
+        *(fb + offs + 3) = (attr >> 24) & 0xFF; //ALPHA
+    */
 
     //Access 32-bit together
-    *((unsigned int *) (fb + offs)) = attr;
+    *((unsigned int*)(fb + offs)) = attr;
 }
 
 
@@ -132,7 +133,7 @@ void drawRectARGB32(int x1, int y1, int x2, int y2, unsigned int attr, int fill)
 // Function to draw line
 void drawLine(int x1, int y1, int x2, int y2, unsigned int attr) {
     for (int x = x1; x <= x2; x++) {
-        int y = (float) (y1 - y2) / (x1 - x2) * (x - x1) + y1;
+        int y = (float)(y1 - y2) / (x1 - x2) * (x - x1) + y1;
         drawPixelARGB32(x, y, attr);
     }
 }
@@ -222,7 +223,5 @@ void drawImg(const unsigned long pixel_data[], int pos_y, int pos_x, int pic_wid
 
 
 void clearScreen() {
-    for (int i = 0; i < WIDTH * HEIGHT; i++) {
-        drawPixelARGB32(i % WIDTH, i / WIDTH, 0x00000000);
-    }
+    drawBackground(0);
 }

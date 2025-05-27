@@ -16,3 +16,7 @@
 #include "./gameObjects/bomb.h"
 #include "./gameObjects/x2_size.h"
 #include "./gameObjects/x2_score.h"
+
+#include "./gameFrames/stage1_intro.h"
+#include "./gameFrames/stage2_intro.h"
+#include "./gameFrames/stage3_intro.h"

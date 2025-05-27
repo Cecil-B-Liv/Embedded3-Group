@@ -7,6 +7,10 @@ typedef struct {
     const unsigned long* sprite;
 } GameObject;
 
+typedef struct {
+    int tag;
+    int probability;
+} BallProbability;
 void gameLoop();
 void moveObject(volatile GameObject* obj, int dx, int dy);
 void drawObject(volatile GameObject* obj);
