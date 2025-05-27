@@ -38,9 +38,9 @@
 #define ENLARGE_TIME 10
 #define MULTIPLY_TIME 10
 
-#define STAGE1_SCORE 60
-#define STAGE2_SCORE 60
-#define STAGE3_SCORE 60
+#define STAGE1_SCORE 100
+#define STAGE2_SCORE 150
+#define STAGE3_SCORE 200
 
 #define STAGE1_TIME 30
 #define STAGE2_TIME 40
@@ -424,7 +424,7 @@ void spawnBall() {
             // set up the game object according to the value get from the get random ball
             objects[i] = (GameObject){
                 .type = ball_type,
-                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH),  // use system counter and score as random factor to spawn 
+                .x = (SYS_TIMER_CLO + score) % (SCREEN_WIDTH- BALL_WIDTH),  // use system counter and score as random factor to spawn 
                 .y = OBJECT_LOCATION_Y,
                 .width = BALL_WIDTH,
                 .height = (ball_type == SPEICAL_BALL_TAG) ? 80 : BALL_HEIGHT,
@@ -637,5 +637,6 @@ void drawStatusBar() {
     drawString(550, 5, goalStr, 0, 4);
 
     drawString(716, 5, "Score:", 0, 4);
-    drawString(901, 5, scoreStr, 0, 4);
+    // Change color if x2 is active, black is default and red is when activate
+    drawString(901, 5, scoreStr, x2ScoreActive ? 0x00FF0000 : 0x00000000, 4);
 }
