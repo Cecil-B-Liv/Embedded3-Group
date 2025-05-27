@@ -38,13 +38,13 @@
 #define ENLARGE_TIME 10
 #define MULTIPLY_TIME 10
 
-#define STAGE1_SCORE 150
-#define STAGE2_SCORE 250
-#define STAGE3_SCORE 350
+#define STAGE1_SCORE 100
+#define STAGE2_SCORE 150
+#define STAGE3_SCORE 200
 
-#define STAGE1_TIME 60
-#define STAGE2_TIME 70
-#define STAGE3_TIME 90
+#define STAGE1_TIME 30
+#define STAGE2_TIME 40
+#define STAGE3_TIME 60
 
 #define BASE_SCORE_MULTIPLIER 1
 #define OBJECT_LOCATION_Y 65
@@ -424,7 +424,7 @@ void spawnBall() {
             // set up the game object according to the value get from the get random ball
             objects[i] = (GameObject){
                 .type = ball_type,
-                .x = SYS_TIMER_CLO % (SCREEN_WIDTH + score - BALL_WIDTH),  // use system counter and score as random factor to spawn 
+                .x = (SYS_TIMER_CLO + score) % (SCREEN_WIDTH- BALL_WIDTH),  // use system counter and score as random factor to spawn 
                 .y = OBJECT_LOCATION_Y,
                 .width = BALL_WIDTH,
                 .height = (ball_type == SPEICAL_BALL_TAG) ? 80 : BALL_HEIGHT,
